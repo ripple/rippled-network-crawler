@@ -3,6 +3,9 @@ import ast
 from datetime import datetime
 import requests
 
+# Disable HTTPS verification warnings. (NOTE: make option later)
+requests.packages.urllib3.disable_warnings()
+
 class Crawler():
   __metaclass__ = ABCMeta
 
@@ -29,8 +32,25 @@ class Crawler():
         self.process_node(peer, hops+1)
 
         # Get peers of nodes with ip address and port
-        if 'ip' in peer and 'port' in peer and peer['ip'] not in self.ips:
-          self.ips.append(peer['ip'])
-          self.crawl(peer['ip'], peer['port'], hops+1)
+        if 'ip' in peer and peer['ip'] not in self.ips
+          # For some nodes the port is in the ip
+          # address contains port also if it's in the ip
+          address = peer['ip'].split(":")
+          ip = address[0]
+          # store unique ips
+          self.ips.append(ip)
+
+          if len(address) == 1: # ip doesn't have port
+            if 'port' in peer:
+              self.crawl(ip, peer['port'], hops+1)
+            elif:
+              # use starting nodes port as default
+              self.crawl(ip, port, hops+1)
+          elif len(address) == 2: # ip has port
+            self.crawl(ip, address[1], hops+1)
+          else 
+            print "unexpected value in ip address"
+
+          
     else:
       print r
