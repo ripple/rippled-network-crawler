@@ -1,0 +1,16 @@
+{
+  "name": "ripple-network-crawl",
+  "version": "0.0.1",
+  "description": "Crawls public ripple network",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "shrug",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^3.7.0",
+    "request": "^2.55.0",
+    "ripple-lib": "^0.12.3"
+  }
+}
