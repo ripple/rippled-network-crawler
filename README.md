@@ -72,9 +72,3 @@ RIPPLED_IP_ADDRESS=s1.ripple.com RIPPLED_PORT=51235 python main.py
 | max_instances   | integer                |
 | ¿distinct public keys per unique IP? | integer |
 | ¿unique_port_count?     | integer         |
-
-CrawlID	INTEGER
-Count		INTEGER	// number of vertices
-Diameter	INTEGER	// max hops across vertices
-Time		INTEGER	// total time for the crawl
-
