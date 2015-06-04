@@ -12,9 +12,9 @@ RIPPLED_IP_ADDRESS=s1.ripple.com RIPPLED_PORT=51235 python main.py
 
 |   Column   |           Type           |
 |------------|--------------------------|
+| id         | bigint                   |
 | entry_ip   | character varying        |
 | entry_port | integer                  |
-| id         | bigint                   |
 | created_at | timestamp with time zone |
 | updated_at | timestamp with time zone |
 
