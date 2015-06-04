@@ -23,7 +23,7 @@ RIPPLED_IP_ADDRESS=s1.ripple.com RIPPLED_PORT=51235 python main.py
 |     Column      |          Type          |
 |-----------------|------------------------|
 | id              | bigint                 |
-| crawl_id        | bigint (crawls.id fk)  |
+| crawl_id        | bigint (crawls.id)     |
 | reqest_id       | bigint                 |
 | public_key      | character              |
 | hops_from_entry | integer                |
@@ -50,8 +50,31 @@ RIPPLED_IP_ADDRESS=s1.ripple.com RIPPLED_PORT=51235 python main.py
 |----------|---------|
 | directed | boolean |
 | id       | bigint  |
-| crawl_id | bigint (crawls.id fk) |
-| from     | bigint (peers.id fk) |
-| to       | bigint (peers.id fk) |
+| crawl_id | bigint (crawls.id) |
+| from     | bigint (peers.id) |
+| to       | bigint (peers.id) |
 
+
+### summary
+
+|     Column      |          Type          |
+|-----------------|------------------------|
+| crawl_id        | bigint (crawls.id)     |
+| vert_count      | integer                |
+| diameter        | integer                |
+| elapsed_time    | integer                |
+| node_count      | integer                |
+| avg_in_degree   | integer                |
+| avg_out_degree  | integer                |
+| debug_count     | integer                |
+| version_count   | integer                |
+| private_count   | integer                |
+| max_instances   | integer                |
+| ¿distinct public keys per unique IP? | integer |
+| ¿unique_port_count?     | integer         |
+
+CrawlID	INTEGER
+Count		INTEGER	// number of vertices
+Diameter	INTEGER	// max hops across vertices
+Time		INTEGER	// total time for the crawl
 
