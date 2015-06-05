@@ -16,7 +16,7 @@ if (argv.length == 1) {
 
 function main(entryIp) {
   var noopLogger = {log: _.noop, error: _.noop};
-  var crawler = new Crawler(100, noopLogger);
+  var crawler = new Crawler(100, undefined);
 
   crawler
     .on('request', function() {
@@ -26,7 +26,7 @@ function main(entryIp) {
       console.log("done");
     })
     .once('done', function(crawlJson) {
-      console.log(crawlJson)
+      console.log(crawlJson.rawResponses)
     }).enter(entryIp)
 
 }

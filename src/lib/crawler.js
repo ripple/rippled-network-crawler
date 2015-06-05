@@ -108,37 +108,43 @@ Crawler.prototype.crawl = function(ipp, hops) {
   var self = this;
   self.queued[ipp] = REQUEST_STATUS.REQUESTING;
 
-  self.crawlOne(ipp, function(err, resp) {
+  self.crawlOne(ipp, function(err, response, body) {
     self.dequeue(ipp);
+
+    //ummmm?
+    /*
+    if (response.statusCode !== undefined)
+      console.log(response.statusCode);
+    */
 
     if (err) {
       self.logger.error(ipp + ' has err ', err);
       self.errors[ipp] = err.code;
     } else {
-      // save raw response
-      self.rawResponses[ipp] = _.cloneDeep(resp);
+      // save raw body
+      self.rawResponses[ipp] = _.cloneDeep(body);
 
-      // process response
-      resp = normalise(resp);
-      self.responses[ipp] = resp;
+      // process body
+      body = normalise(body);
+      self.responses[ipp] = body;
 
-      // What to do with response
-      resp.overlay.active.forEach(function(p) {
-        //self.savePeerData(p.public_key, active, true);
-        //self.savePeerData(p.public_key, {hops: hops}, true);
+      // What to do with body
+      body.overlay.active.forEach(function(p) {
+        //console.log(p);
+        self.savePeerData(p.public_key, p, true);
+        self.savePeerData(p.public_key, {hops: hops}, true);
         self.enqueueIfNeeded(p.ip_and_port);
       });
     }
-
+    
     // Crawl peers
     if (!self.requestMore(hops)) {
       self.emit('done', {responses: self.responses,
-                         peersData: self.peersData});
+                         peersData: self.peersData,
+                         rawResponses: self.rawResponses});
     }
   });
 };
-
-
 
 /**
 *
@@ -152,7 +158,6 @@ Crawler.prototype.crawl = function(ipp, hops) {
 * @param {Object} data - one individual view of that peers data
 *
 */
-/*
 Crawler.prototype.savePeerData = function(pk, data, defaults) {
   var map = this.peersData[pk] !== undefined ? this.peersData[pk] :
                                                this.peersData[pk] = {};
@@ -166,9 +171,6 @@ Crawler.prototype.savePeerData = function(pk, data, defaults) {
     map[k] = v;
   });
 };
-*/
-
-
 
 /*
 * Crawls over one node at ipp and retreives json 
@@ -177,10 +179,10 @@ Crawler.prototype.crawlOne = function(ipp, cb) {
   var self;
   this.currentRequests++;
   self = this;
-  self.crawlRequest(ipp, function(err, json) {
+  self.crawlRequest(ipp, function(err, response, json) {
     self.currentRequests--;
-    self.emit('request', err, json);
-    cb(err, json);
+    self.emit('request', err, response, json);
+    cb(err, response, json);
   });
 };
 
@@ -188,9 +190,14 @@ Crawler.prototype.crawlOne = function(ipp, cb) {
 * Actually sends the request to retreive the json 
 */
 Crawler.prototype.crawlRequest = function(ip, onResponse) {
-  var options = {url: crawlUrl(ip), timeout: 5000};
+  var self = this;
+  var options = { url: crawlUrl(ip), 
+                  timeout: 5000, 
+                  rejectUnauthorized: false,
+                  requestCert: true,
+                  agent: false };
   request(options, function(err, response, body) {
-    onResponse(err, body ? JSON.parse(body) : null);
+    onResponse(err, response, body ? JSON.parse(body) : null);
   });
 }
 
