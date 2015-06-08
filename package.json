@@ -1,16 +1,34 @@
 {
-  "name": "ripple-network-crawl",
-  "version": "0.0.1",
-  "description": "Crawls public ripple network",
-  "main": "index.js",
+  "name": "rippled-network-crawler",
+  "version": "0.0.2",
+  "description": "Crawls public Ripple network",
+  "main": "src/crawl.js",
   "scripts": {
     "test": "npm test"
   },
-  "author": "shrug",
+  "author": "Souren Papazian",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^2.9.27",
     "lodash": "^3.7.0",
     "request": "^2.55.0",
     "ripple-lib": "^0.12.3"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SourenP/rippled-network-crawler.git"
+  },
+  "keywords": [
+    "ripple",
+    "crawler",
+    "rippled"
+  ],
+  "bugs": {
+    "url": "https://github.com/SourenP/rippled-network-crawler/issues"
+  },
+  "homepage": "https://github.com/SourenP/rippled-network-crawler#readme"
 }

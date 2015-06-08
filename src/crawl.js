@@ -4,6 +4,7 @@ var Crawler = require('./lib/crawler').Crawler;
 
 /* ---------------------------------- MAIN ---------------------------------- */
 
+/*
 var argv = process.argv.slice(2);
 
 if (argv.length == 1) {
@@ -12,6 +13,20 @@ if (argv.length == 1) {
   console.error('eg: `node src/crawl.js '+
                 '192.170.145.67 ');
   process.exit(1);
+}
+*/
+
+function newCrawler(maxRequests, logger) {
+  return new Crawler(maxRequests, logger);
+}
+
+Crawler.prototype.crawlResp = function(entryIp) {
+  var self = this;
+  return new Promise(function(resolve, reject){
+    self.once('done', function(crawlJson) {
+      resolve(crawlJson.rawResponses)
+    }).enter(entryIp)
+  })
 }
 
 function main(entryIp) {
@@ -28,5 +43,6 @@ function main(entryIp) {
     .once('done', function(crawlJson) {
       console.log(crawlJson.rawResponses)
     }).enter(entryIp)
-
 }
+
+exports.Crawler = newCrawler;
