@@ -1,9 +1,15 @@
 # Ripple Network Crawl
 
-Python script that recursively hits the rippled /crawl endpoint to discover all connected peers.
+``` javascript
+Crawler = require('rippled-network-crawler').Crawler
 
-```sh
-node src/crawl.js s1.ripple.com 2> error.log
+var c = Crawler(100)
+c.crawlResp("s1.ripple.com").then(function(result) {
+  console.log(result);
+})
+.catch(function(error) {
+  console.log('error', error)
+})
 ```
 
 ## Schema
