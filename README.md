@@ -1,11 +1,16 @@
 # Ripple Network Crawl
 
+## Run
+
+`node test/test.js s1.ripple.com`
+
+## Test 
 ``` javascript
-Crawler = require('rippled-network-crawler').Crawler
+Crawler = require('../src/crawl.js').Crawler
 
 var c = Crawler(100)
 c.crawlResp("s1.ripple.com").then(function(result) {
-  console.log(result);
+  return res.send(result);
 })
 .catch(function(error) {
   console.log('error', error)
