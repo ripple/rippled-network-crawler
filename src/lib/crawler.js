@@ -3,6 +3,7 @@ var util = require('util');
 var request = require('request');
 var ripple = require('ripple-lib');
 var sjcl = ripple.sjcl;
+var moment = require('moment');
 var EventEmitter = require('events').EventEmitter;
 
 /* --------------------------------- CONSTS --------------------------------- */
@@ -95,6 +96,8 @@ util.inherits(Crawler, EventEmitter);
 * Enter at ip to start crawl
 */
 Crawler.prototype.enter = function(ip) {
+  this.startTime = moment().format();
+  this.entryIP = withDefaultPort(ip);
   this.crawl(withDefaultPort(ip), 0);
 };
 
@@ -131,8 +134,13 @@ Crawler.prototype.crawl = function(ipp, hops) {
     
     // Crawl peers
     if (!self.requestMore(hops)) {
-      self.emit('done', {data: self.rawResponses,
-                         errors: self.errors});
+      self.endTime = moment().format();
+      self.emit('done', { start:    self.startTime,
+                          end:      self.endTime,
+                          entry:    self.entryIP,
+                          data:     self.rawResponses,
+                          errors:   self.errors
+                        });
     }
   });
 };
