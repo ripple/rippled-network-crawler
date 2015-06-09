@@ -82,15 +82,13 @@ function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
   this.maxRequests = maxRequests ? maxRequests : 30;
   this.currentRequests = 0; // active requests
-  this.responses = {}; // {$ip_and_port : $normalised_response}
-  this.rawResponses = {}; // {$ip_and_port : defensiveCopy($raw_responses)}
+  this.rawResponses = {}; // {$ip_and_port : $normalised_response}
   this.queued = {}; // {$ip_and_port : REQUEST_STATUS.*}
   this.errors = {}; // {$ip_and_port : $error_code_int}
   this.peersData = {}; // {b58_normed(pubKey) : {...}}
   this.logger = logger || console;
 }
 
-// NOTE: Not sure what this does yet
 util.inherits(Crawler, EventEmitter);
 
 /*
@@ -122,26 +120,19 @@ Crawler.prototype.crawl = function(ipp, hops) {
       self.errors[ipp] = err.code;
     } else {
       // save raw body
-      self.rawResponses[ipp] = _.cloneDeep(body);
+      self.rawResponses[ipp] = body;
 
-      // process body
-      body = normalise(body);
-      self.responses[ipp] = body;
-
-      // What to do with body
-      body.overlay.active.forEach(function(p) {
-        //console.log(p);
-        self.savePeerData(p.public_key, p, true);
-        self.savePeerData(p.public_key, {hops: hops}, true);
+      // Normalize body and loop over each normalized peer
+      norm_body = normalise(body);
+      norm_body.overlay.active.forEach(function(p) {
         self.enqueueIfNeeded(p.ip_and_port);
       });
     }
     
     // Crawl peers
     if (!self.requestMore(hops)) {
-      self.emit('done', {responses: self.responses,
-                         peersData: self.peersData,
-                         rawResponses: self.rawResponses});
+      self.emit('done', {data: self.rawResponses,
+                         errors: self.errors});
     }
   });
 };
@@ -223,7 +214,7 @@ Crawler.prototype.requestMore = function(hops) {
 */
 Crawler.prototype.enqueueIfNeeded = function(ipp) {
   if (ipp) {
-    if ((this.responses[ipp] === undefined) &&
+    if ((this.rawResponses[ipp] === undefined) &&
         (this.queued[ipp] === undefined) &&
         (this.errors[ipp] === undefined)) {
       this.enqueue(ipp);
@@ -231,9 +222,6 @@ Crawler.prototype.enqueueIfNeeded = function(ipp) {
   }
 }
 
-/*
-* If not already queued, set status to queued
-*/
 Crawler.prototype.enqueue = function(ipp) {
   abortIfNot(this.queued[ipp] === undefined, 'queued already');
   this.queued[ipp] = REQUEST_STATUS.QUEUED;
