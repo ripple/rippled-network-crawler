@@ -4,6 +4,20 @@
 
 `node test/test.js s1.ripple.com`
 
+## Response
+
+Returns a json with the crawl information
+
+##### JSON structure
+
+|   Field    |    Description           |
+|------------|--------------------------|
+| start      | Crawl start time         |
+| end        | Crawl end time           |
+| entry      | Crawl entry ip:port      |
+| data       | Raw data collected       |
+| errors     | Errors                   |
+
 ## Test 
 ``` javascript
 Crawler = require('../src/crawl.js').Crawler
