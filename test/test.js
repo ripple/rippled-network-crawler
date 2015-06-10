@@ -16,7 +16,7 @@ function main(entryIp) {
   var noopLogger = {log: _.noop, error: _.noop};
   var c = Crawler(100, noopLogger)
 
-  c.crawlResp(entryIp).then(function(response) {
+  c.crawl(entryIp).then(function(response) {
     return console.log(response);
   })
   .catch(function(error) {
