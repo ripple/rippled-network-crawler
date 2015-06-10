@@ -5,7 +5,7 @@ function newCrawler(maxRequests, logger) {
   return new Crawler(maxRequests, logger);
 }
 
-Crawler.prototype.crawlResp = function(entryIp) {
+Crawler.prototype.crawl = function(entryIp) {
   var self = this;
   return new Promise(function(resolve, reject){
     self.once('done', function(response) {
