@@ -51,30 +51,27 @@ function normalizePubKey(pubKeyStr) {
 * @param {Object} resp - response from a /crawl request
 */
 function normalise(resp) {
-  var active = [];
+  var resp_copy = _.cloneDeep(resp); 
 
-  resp.overlay.active.forEach(function(p) {
-    var copy = _.cloneDeep(p);
-    copy.public_key = normalizePubKey(p.public_key);
-    active.push(copy);
-    var ip = p.ip;
+  resp_copy.overlay.active.forEach(function(peer) {
+    peer.public_key = normalizePubKey(peer.public_key);
+    var ip = peer.ip;
 
     if (ip) {
       var split = ip.split(':'),
                   splitIp = split[0],
                   port = split[1];
 
-      copy.ip = splitIp;
-      copy.port = port ? port : 51235;
+      peer.ip = splitIp;
+      peer.port = port ? port : 51235;
 
-      if (p.type === 'peer') {
-        copy.type = port ? 'out' : 'in';
+      if (peer.type === 'peer') {
+        peer.type = port ? 'out' : 'in';
       }
-      copy.ip_and_port = copy.ip + ':' + copy.port;
+      peer.ip_and_port = peer.ip + ':' + peer.port;
     }
   });
-  resp.overlay.active = active;
-  return resp;
+  return resp_copy;
 }
 
 /* --------------------------------- CRAWLER -------------------------------- */
@@ -120,12 +117,6 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
   self.crawlOne(ipp, function(err, response, body) {
     self.dequeue(ipp);
-
-    //ummmm?
-    /*
-    if (response.statusCode !== undefined)
-      console.log(response.statusCode);
-    */
 
     if (err) {
       self.logger.error(ipp + ' has err ', err);
