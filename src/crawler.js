@@ -1,8 +1,6 @@
 var _ = require('lodash');
 var util = require('util');
 var request = require('request');
-var ripple = require('ripple-lib');
-var sjcl = ripple.sjcl;
 var moment = require('moment');
 var EventEmitter = require('events').EventEmitter;
 
@@ -37,41 +35,20 @@ function withDefaultPort(domainOrIp) {
                                           domainOrIp + ':51235';
 }
 
-function normalizePubKey(pubKeyStr) {
-  if (pubKeyStr.length > 50 && pubKeyStr[0] == 'n') {
-    return pubKeyStr;
-  }
+function get_ipp(peer) {
+  var copy = _.cloneDeep(peer);
+  var ip = copy.ip
 
-  var bits = sjcl.codec.base64.toBits(pubKeyStr);
-  var bytes = sjcl.codec.bytes.fromBits(bits);
-  return ripple.Base.encode_check(ripple.Base.VER_NODE_PUBLIC, bytes);
-}
-
-/**
-* @param {Object} resp - response from a /crawl request
-*/
-function normalise(resp) {
-  var resp_copy = _.cloneDeep(resp); 
-
-  resp_copy.overlay.active.forEach(function(peer) {
-    peer.public_key = normalizePubKey(peer.public_key);
-    var ip = peer.ip;
-
-    if (ip) {
+  if (ip) {
       var split = ip.split(':'),
                   splitIp = split[0],
                   port = split[1];
 
-      peer.ip = splitIp;
-      peer.port = port ? port : 51235;
-
-      if (peer.type === 'peer') {
-        peer.type = port ? 'out' : 'in';
-      }
-      peer.ip_and_port = peer.ip + ':' + peer.port;
-    }
-  });
-  return resp_copy;
+      copy.ip = splitIp;
+      copy.port = port ? port : 51235;
+  }
+  ipp = copy.ip + ':' + copy.port;
+  return ipp
 }
 
 /* --------------------------------- CRAWLER -------------------------------- */
@@ -126,9 +103,8 @@ Crawler.prototype.crawl = function(ipp, hops) {
       self.rawResponses[ipp] = body;
 
       // Normalize body and loop over each normalized peer
-      norm_body = normalise(body);
-      norm_body.overlay.active.forEach(function(p) {
-        self.enqueueIfNeeded(p.ip_and_port);
+      body.overlay.active.forEach(function(p) {
+        self.enqueueIfNeeded(get_ipp(p));
       });
     }
     
@@ -241,4 +217,3 @@ Crawler.prototype.dequeue = function(ipp) {
 };
 
 exports.Crawler = Crawler;
-exports.normalizePubKey = normalizePubKey;
