@@ -92,6 +92,15 @@ function Crawler(maxRequests, logger) {
 
 util.inherits(Crawler, EventEmitter);
 
+Crawler.prototype.getCrawl = function(entryIp) {
+  var self = this;
+  return new Promise(function(resolve, reject){
+    self.once('done', function(response) {
+      resolve(response)
+    }).enter(entryIp)
+  })
+}
+
 /*
 * Enter at ip to start crawl
 */

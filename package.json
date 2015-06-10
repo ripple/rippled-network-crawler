@@ -2,7 +2,7 @@
   "name": "rippled-network-crawler",
   "version": "0.0.6",
   "description": "Crawls public Ripple network",
-  "main": "src/crawl.js",
+  "main": "src/crawler.js",
   "scripts": {
     "test": "npm test"
   },

@@ -1,4 +1,4 @@
-Crawler = require('../src/crawl.js').Crawler
+Crawler = require('../src/crawler.js').Crawler
 var _ = require('lodash');
 
 
@@ -14,9 +14,9 @@ if (argv.length == 1) {
 
 function main(entryIp) {
   var noopLogger = {log: _.noop, error: _.noop};
-  var c = Crawler(100, noopLogger)
+  var crawler = new Crawler(100, noopLogger)
 
-  c.crawl(entryIp).then(function(response) {
+  crawler.getCrawl(entryIp).then(function(response) {
     return console.log(response);
   })
   .catch(function(error) {
