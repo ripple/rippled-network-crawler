@@ -22,8 +22,8 @@ Returns a json with the crawl information
 ``` javascript
 Crawler = require('../src/crawl.js').Crawler
 
-var c = Crawler(100)
-c.crawl("s1.ripple.com").then(function(response) {
+var crawler = Crawler(100)
+crawler.getCrawl("s1.ripple.com").then(function(response) {
   console.log(response);
 })
 .catch(function(error) {
