@@ -3,6 +3,8 @@ var util = require('util');
 var request = require('request');
 var moment = require('moment');
 var EventEmitter = require('events').EventEmitter;
+var ripple = require('ripple-lib');
+var sjcl = ripple.sjcl;
 
 /* --------------------------------- CONSTS --------------------------------- */
 
@@ -12,6 +14,8 @@ var REQUEST_STATUS = {
   QUEUED: 1,
   REQUESTING: 2
 };
+
+DEFAULT_PORT = 51235
 
 /* --------------------------------- HELPERS -------------------------------- */
 
@@ -32,22 +36,34 @@ function crawlUrl(domainOrIp) {
 
 function withDefaultPort(domainOrIp) {
   return domainOrIp.indexOf(':') !== -1 ? domainOrIp :
-                                          domainOrIp + ':51235';
+                                          domainOrIp + ':' + DEFAULT_PORT;
 }
 
-function get_ipp(peer) {
-  var copy = _.cloneDeep(peer);
-  var ip = copy.ip
-
-  if (ip) {
-      var split = ip.split(':'),
-                  splitIp = split[0],
-                  port = split[1];
-
-      copy.ip = splitIp;
-      copy.port = port ? port : 51235;
+function normalizePubKey(pubKeyStr) {
+  if (pubKeyStr.length > 50 && pubKeyStr[0] == 'n') {
+    return pubKeyStr;
   }
-  ipp = copy.ip + ':' + copy.port;
+
+  var bits = sjcl.codec.base64.toBits(pubKeyStr);
+  var bytes = sjcl.codec.bytes.fromBits(bits);
+  return ripple.Base.encode_check(ripple.Base.VER_NODE_PUBLIC, bytes);
+}
+
+/*
+* deals with a variety of (ip, port) possibilities that occur 
+* in rippled responses and normalizes them to the format 'ip:port'
+*/
+function normalizeIpp(ip, port) {
+  if (ip) {
+    var split = ip.split(':'),
+        splitIp = split[0],
+        splitPort = split[1];
+
+    out_ip = splitIp
+    out_port = port || splitPort || DEFAULT_PORT
+    ipp = out_ip + ':' + out_port
+  }
+
   return ipp
 }
 
@@ -104,7 +120,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
       // Normalize body and loop over each normalized peer
       body.overlay.active.forEach(function(p) {
-        self.enqueueIfNeeded(get_ipp(p));
+        self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
       });
     }
     
@@ -217,3 +233,6 @@ Crawler.prototype.dequeue = function(ipp) {
 };
 
 exports.Crawler = Crawler;
+exports.normalizeIpp = normalizeIpp;
+exports.normalizePubKey = normalizePubKey;
+

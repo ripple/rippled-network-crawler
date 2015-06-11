@@ -1,6 +1,6 @@
 {
   "name": "rippled-network-crawler",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Crawls public Ripple network",
   "main": "src/crawler.js",
   "scripts": {
@@ -12,7 +12,8 @@
     "bluebird": "^2.9.27",
     "lodash": "^3.7.0",
     "request": "^2.55.0",
-    "moment": "2.10.3"
+    "moment": "2.10.3",
+    "ripple-lib": "^0.12.3"
   },
   "directories": {
     "test": "test"
