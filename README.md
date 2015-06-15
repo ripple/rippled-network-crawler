@@ -2,7 +2,7 @@
 
 ## Run
 
-`node test/test.js s1.ripple.com`
+`node misc/crawl.js 192.170.145.70:51235`
 
 ## Response
 
@@ -18,12 +18,12 @@ Returns a json with the crawl information
 | data       | Raw data collected       |
 | errors     | Errors                   |
 
-## Test 
+## Example 
 ``` javascript
-Crawler = require('../src/crawl.js').Crawler
+Crawler = require('rippled-network-crawler').Crawler
 
 var crawler = Crawler(100)
-crawler.getCrawl("s1.ripple.com").then(function(response) {
+crawler.getCrawl("192.170.145.70:51235").then(function(response) {
   console.log(response);
 })
 .catch(function(error) {
