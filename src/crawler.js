@@ -141,7 +141,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
     self.dequeue(ipp);
 
     if (err) {
-      self.logger.error(ipp + ' has err ', err);
+      //self.logger.error(ipp + ' has err ', err); commented for development purposes, should be uncommented later
       self.errors[ipp] = err.code;
     } else {
       // save raw body
