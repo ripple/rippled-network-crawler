@@ -5,6 +5,8 @@ var moment = require('moment');
 var EventEmitter = require('events').EventEmitter;
 var ripple = require('ripple-lib');
 var sjcl = ripple.sjcl;
+var check = require('check-types');
+var Promise = require('bluebird')
 
 /* --------------------------------- CONSTS --------------------------------- */
 
@@ -15,7 +17,9 @@ var REQUEST_STATUS = {
   REQUESTING: 2
 };
 
-DEFAULT_PORT = 51235
+var DEFAULT_PORT = 51235
+
+var IPP_PATTERN = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\:([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\b/;
 
 /* --------------------------------- HELPERS -------------------------------- */
 
@@ -61,7 +65,7 @@ function normalizeIpp(ip, port) {
 
     out_ip = splitIp
     out_port = port || splitPort || DEFAULT_PORT
-    ipp = out_ip + ':' + out_port
+    var ipp = out_ip + ':' + out_port
   }
 
   return ipp
@@ -71,22 +75,43 @@ function normalizeIpp(ip, port) {
 
 function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
-  this.maxRequests = maxRequests ? maxRequests : 30;
+  
+ 
+  // maxRequests checks
+  maxRequests = maxRequests ? maxRequests : 30;
+  if (!maxRequests || maxRequests < 1) {
+    throw new Error("Invalid max requests");
+  }
+  check.assert.number(maxRequests, "Invalid max requests");
+  
+  // logger checks
+  logger = logger ? logger : console
+  if (!logger.log || !logger.error) {
+    throw new Error("Invalid logger");
+  }
+
+  this.maxRequests = maxRequests;
   this.currentRequests = 0; // active requests
   this.rawResponses = {}; // {$ip_and_port : $normalised_response}
   this.queued = {}; // {$ip_and_port : REQUEST_STATUS.*}
   this.errors = {}; // {$ip_and_port : $error_code_int}
   this.peersData = {}; // {b58_normed(pubKey) : {...}}
-  this.logger = logger || console;
+  this.logger = logger;
 }
 
 util.inherits(Crawler, EventEmitter);
 
 Crawler.prototype.getCrawl = function(entryIp) {
   var self = this;
-  return new Promise(function(resolve, reject){
+  return new Promise(function(resolve, reject) {
+    if (entryIp === undefined) {
+      return reject(new Error("Invalid ip address")) 
+    }
+    if (entryIp.split(' ').length != 1 || !IPP_PATTERN.test(entryIp)) {
+      return reject(new Error("Invalid ip address (perhaps port missing)"))
+    }
     self.once('done', function(response) {
-      resolve(response)
+      return resolve(response)
     }).enter(entryIp)
   })
 }
@@ -112,7 +137,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
     self.dequeue(ipp);
 
     if (err) {
-      self.logger.error(ipp + ' has err ', err);
+      //self.logger.error(ipp + ' has err ', err);
       self.errors[ipp] = err.code;
     } else {
       // save raw body

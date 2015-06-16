@@ -4,7 +4,7 @@
   "description": "Crawls public Ripple network",
   "main": "src/crawler.js",
   "scripts": {
-    "test": "npm test"
+    "test": "mocha"
   },
   "author": "Souren Papazian",
   "license": "ISC",
@@ -13,12 +13,14 @@
     "lodash": "^3.7.0",
     "request": "^2.55.0",
     "moment": "2.10.3",
-    "ripple-lib": "^0.12.3"
+    "ripple-lib": "^0.12.3",
+    "chai": "^3.0.0",
+    "check-types": "^3.3.0",
+    "mocha": "^2.2.5"
   },
   "directories": {
     "test": "test"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SourenP/rippled-network-crawler.git"
