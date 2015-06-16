@@ -66,6 +66,8 @@ function normalizeIpp(ip, port) {
     out_ip = splitIp
     out_port = port || splitPort || DEFAULT_PORT
     var ipp = out_ip + ':' + out_port
+  } else {
+    throw new Error("ip is undefined")
   }
 
   return ipp
@@ -76,18 +78,20 @@ function normalizeIpp(ip, port) {
 function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
   
- 
   // maxRequests checks
   maxRequests = maxRequests ? maxRequests : 30;
-  if (!maxRequests || maxRequests < 1) {
+  check.assert.number(maxRequests, "Invalid max requests");
+  if (maxRequests < 1) {
     throw new Error("Invalid max requests");
   }
-  check.assert.number(maxRequests, "Invalid max requests");
   
   // logger checks
   logger = logger ? logger : console
   if (!logger.log || !logger.error) {
     throw new Error("Invalid logger");
+  }
+  if (typeof logger.log != "function" || typeof logger.error != "function") {
+    throw new TypeError("log and error must be functions");
   }
 
   this.maxRequests = maxRequests;
@@ -105,10 +109,10 @@ Crawler.prototype.getCrawl = function(entryIp) {
   var self = this;
   return new Promise(function(resolve, reject) {
     if (entryIp === undefined) {
-      return reject(new Error("Invalid ip address")) 
+      throw new Error("Invalid ip address")
     }
     if (entryIp.split(' ').length != 1 || !IPP_PATTERN.test(entryIp)) {
-      return reject(new Error("Invalid ip address (perhaps port missing)"))
+      throw new Error("Invalid ip address (perhaps port missing)")
     }
     self.once('done', function(response) {
       return resolve(response)
@@ -137,7 +141,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
     self.dequeue(ipp);
 
     if (err) {
-      //self.logger.error(ipp + ' has err ', err);
+      //self.logger.error(ipp + ' has err ', err); commented for development purposes, should be uncommented later
       self.errors[ipp] = err.code;
     } else {
       // save raw body
@@ -145,7 +149,11 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
       // Normalize body and loop over each normalized peer
       body.overlay.active.forEach(function(p) {
-        self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
+        try {
+          self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
+        } catch (err) {
+          self.errors[p.public_key] = err.message;
+        }
       });
     }
     
