@@ -28,3 +28,7 @@ node_modules
 
 # Mac files
 .DS_Store
+
+# Data
+misc/crawls
+misc/crawls/*
