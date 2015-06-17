@@ -9,7 +9,8 @@ var argv = process.argv.slice(2);
 
 if (argv.length == 1) {
   var obj = JSON.parse(fs.readFileSync(argv[0], 'utf8'));
-  console.log(JSON.stringify(crawlInfo(obj), null, 4));
+  results = crawlInfo(obj);
+  console.log(JSON.stringify(results, null, 4));
 } else {
   console.error('eg: node misc/info.js misc/crawls/crawl1.json');
   process.exit(1);
@@ -27,10 +28,16 @@ function crawlInfo(rawCrawl) {
     for (var p_key in peers) {
       peer = peers[p_key]
       // A peer (not necessarily unique)
-      ipp = normalizeIpp(peer.ip, peer.port);
+      try {
+        ipp = normalizeIpp(peer.ip, peer.port);
+      } catch (err) {
+        ipp = undefined;
+      }
+
       public_key = normalizePubKey(peer.public_key);
       version = peer.version
       type = peer.type
+
       if (ipp != undefined && ipp != "undefined:undefined") {
         geoloc = geoip.lookup(ipp.split(':')[0])
         location = geoloc.country + '_' + geoloc.city
@@ -59,28 +66,34 @@ function crawlInfo(rawCrawl) {
 
         // general
         results.general.nodes += 1;
+      }
 
-        // links
-        // Make link
-        if (type) {
-          // Get link
-          // NOTE: acutally much more complicated, see https://github.com/sublimator/ripple-pub-crawl
-          if (type == "in")
-            link = [r_key, ipp]
-          else if (type == "out" || type == "peer")
-            link = [ipp, r_key]
-          else {
-            link = undefined
-            console.log(type)
+      // links
+      // Make link
+      var link = undefined
+      if (type) {
+        // Get link
+        if (type == "in") {
+          link = [r_key, ipp]
+        }
+        else if (type == "out") {
+          link = [ipp, r_key]
+        }
+        else if (type == "peer") {
+          if (peer.ip) {
+            if (peer.ip.split(":").length == 2)
+              link = [ipp, r_key]
+            else
+              link = [r_key, ipp]
           }
-
-          // If link doesn't exist, add it
-          if (link && !results.links[link])
-              results.links[link] = 1
         }
 
+        if (link) {
+          results.links[link] = 1
+        }
       }
     }
   }
+  results.general.connections = Object.keys(results.links).length;
   return results
 }
