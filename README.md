@@ -12,7 +12,14 @@ have any say in influencing the outcome of a transaction on mainnet.
 
 ## Run
 
-`node misc/crawl.js 192.170.145.70:51235`
+<<<<<<< HEAD
+```
+=======
+``` bash
+>>>>>>> 0684ef3... fixed typo in readme
+npm install 
+node misc/crawl.js 192.170.145.70:51235
+```
 
 ## Response
 
@@ -194,3 +201,72 @@ Boolean flags, set true by presence of environment variable:
 | exceptions | json                     |
 | created_at | timestamp with time zone |
 | updated_at | timestamp with time zone |
+<<<<<<< HEAD
+=======
+
+### peers
+
+|     Column      |          Type          |
+|-----------------|------------------------|
+| id              | bigint                 |
+| crawl_id        | bigint (crawls.id)     |
+| reqest_id       | bigint                 |
+| public_key      | character              |
+| hops_from_entry | integer                |
+| reachable       | boolean                |
+| version         | character              |
+| ip              | character              |
+| port            | integer                |
+| city            | character              |
+| country         | character              |
+| region          | character              |
+
+### requests
+
+|     Column      |          Type          |
+|-----------------|------------------------|
+| id              | bigint                 |
+| requested_at    | timestamp with time zone|
+| response_time   | integer                |
+| raw_data        | character              |
+
+### edges
+
+|  Column  |  Type   |
+|----------|---------|
+| directed | boolean |
+| id       | bigint  |
+| crawl_id | bigint (crawls.id) |
+| from     | bigint (peers.id) |
+| to       | bigint (peers.id) |
+
+
+### summary
+
+|     Column      |          Type          |
+|-----------------|------------------------|
+| crawl_id        | bigint (crawls.id)     |
+| vert_count      | integer                |
+| diameter        | integer                |
+| elapsed_time    | integer                |
+| node_count      | integer                |
+| avg_in_degree   | integer                |
+| avg_out_degree  | integer                |
+| debug_count     | integer                |
+| version_count   | integer                |
+| private_count   | integer                |
+| max_instances   | integer                |
+| ¿distinct public keys per unique IP? | integer |
+| ¿unique_port_count?     | integer         |
+
+
+## Visualize
+
+``` bash
+npm install 
+npm install -g http-server
+node misc/crawl.js 192.170.145.70:51235 -r > misc/crawls/crawl.json
+node misc/graphify.js misc/crawls/crawl.json > misc/crawls/graph.json
+cd misc/
+http-server -o
+```

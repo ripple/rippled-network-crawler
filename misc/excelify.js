@@ -7,3 +7,4 @@ console.log("---")
 for(var i in graph.iplinks) {
 	console.log(graph.iplinks[i].target)
 }
+

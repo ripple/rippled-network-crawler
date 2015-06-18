@@ -5,8 +5,7 @@ var crawler = require('../src/crawler.js');
 var normalizeIpp = crawler.normalizeIpp;
 var normalizePubKey = crawler.normalizePubKey;
 
-var rawCrawl = require('./crawls/crawl1.json');
-
+var rawCrawl = require('../' + process.argv.slice(2)[0]);
 
 function graphify(rawCrawl) {
 
@@ -21,7 +20,11 @@ function graphify(rawCrawl) {
   // Collect all unique nodes and save their indices
   for (var ipp in rawCrawl.data) {
     indices[ipp] = nodes.length
-    nodes.push({ipp: ipp})
+    if (nodes.length == 0) {
+      nodes.push({ipp: ipp, connections: 0, entry: 1})
+    } else {
+      nodes.push({ipp: ipp, connections: 0, entry: 0})
+    }
     keyToIp[ipp]
   }
 
@@ -42,15 +45,17 @@ function graphify(rawCrawl) {
         peer_ipp = undefined;
       }
       peer_i = indices[peer_ipp];
+
       // If it has an ipp
-      if (peer_ipp && peer_i) {
+      if (peer_ipp && peer_i !== undefined) {
         peer_pk = normalizePubKey(peer.public_key);
         peer_v = peer.version;
-        
         peer_t = peer.type;
 
         // Fill out info in unique node list
         peer_node = nodes[peer_i];
+
+        //console.error(peer_ipp)
         if (!peer_node.pk) {
           peer_node.pk = peer_pk
         }
@@ -97,7 +102,8 @@ function graphify(rawCrawl) {
   }
 
   // Ready to write to out
-  out.nodes = nodes
+
+  // links
   for (link in links) {
     var st = link.split(','),
         s = parseInt(st[0]),
@@ -105,7 +111,12 @@ function graphify(rawCrawl) {
 
     out.links.push({source: s, target: t, value: links[link]});
     out.iplinks.push({source: nodes[s].ipp, target: nodes[t].ipp, value: links[link]});
+    nodes[s].connections += 1;
+    //nodes[t].connections += 1;
   }
+
+  // nodes
+  out.nodes = nodes
 
   return out
 }
