@@ -30,5 +30,4 @@ node_modules
 .DS_Store
 
 # Data
-misc/crawls
-misc/crawls/*
+misc/crawls/
