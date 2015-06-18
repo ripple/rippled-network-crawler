@@ -5,18 +5,22 @@ var Sequelize = require('sequelize');
 var Promise = Sequelize.Promise;
 var modelsFactory = require('../src/models.js');
 
+/* --------------------------------- CONSTS --------------------------------- */
+
+var config = {};
+
+['DROP_TABLES', 'LOG_SQL', 'LOG_CRAWL'].forEach(function(k) {
+  config[k] = process.env[k] !== undefined;
+});
+
 /* --------------------------------- HELPERS -------------------------------- */
 
-function prettyJSON(o) {
-  return JSON.stringify(o, undefined, 2);
-}
-
 var saveDB = exports.saveDB = function saveDB(crawlJson, entryIp, dbUrl, onDone) {
-  var sql = new Sequelize(dbUrl, {logging: console.log, dialectOptions: {ssl: true}});
+  var sql = new Sequelize(dbUrl, {logging: config.LOG_SQL ? console.log : false, dialectOptions: {ssl: true}});
   var models = modelsFactory(sql, Sequelize);
 
   sql
-  .sync({force: false})
+  .sync({force: config.DROP_TABLES})
   .then(function() {
     return models.Crawl.create({  start_at: crawlJson.start,
                                   end_at: crawlJson.end,
@@ -27,8 +31,8 @@ var saveDB = exports.saveDB = function saveDB(crawlJson, entryIp, dbUrl, onDone)
   }).then(function() {
     onDone(null);
   })
-  .catch(function(e) {
-    onDone(e);
+  .catch(function(error) {
+    onDone(error);
   });
 }
 
@@ -44,13 +48,17 @@ if (argv.length == 2) {
 }
 
 function main(entryIp, dbUrl) {
-  var noopLogger = {log: _.noop, error: _.noop};
-  var crawler = new Crawler(100, noopLogger)
+  if (config.DROP_TABLES) {
+    console.warn('DROP_TABLES', config.DROP_TABLES);
+  }
 
-  crawler.getCrawl(entryIp).then(function(response) {
-    saveDB(response, entryIp, dbUrl, function(error) {
+  var noopLogger = {log: _.noop, error: _.noop};
+  var crawler = new Crawler(100, config.LOG_CRAWL ? undefined : noopLogger)
+
+  crawler.getCrawl(entryIp).then(function(crawlJson) {
+    saveDB(crawlJson, entryIp, dbUrl, function(error) {
         if (error) {
-          throw new Error("Database error:", err);
+          console.error("Database error:", error);
           process.exit(1);
         } else {
           process.exit(0);
@@ -58,7 +66,7 @@ function main(entryIp, dbUrl) {
     });
   })
   .catch(function(error) {
-    throw new Error("Crawler error:", error);
+    console.error("Crawler error:", error);
     process.exit(1);
   })
 }
