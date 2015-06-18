@@ -10,13 +10,14 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^2.9.27",
-    "lodash": "^3.7.0",
-    "request": "^2.55.0",
-    "moment": "2.10.3",
-    "ripple-lib": "^0.12.3",
     "chai": "^3.0.0",
     "check-types": "^3.3.0",
-    "mocha": "^2.2.5"
+    "lodash": "^3.7.0",
+    "mocha": "^2.2.5",
+    "moment": "2.10.3",
+    "request": "^2.55.0",
+    "ripple-lib": "^0.12.3",
+    "sequelize": "^3.2.0"
   },
   "directories": {
     "test": "test"
