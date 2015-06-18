@@ -141,7 +141,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
     self.dequeue(ipp);
 
     if (err) {
-      //self.logger.error(ipp + ' has err ', err); commented for development purposes, should be uncommented later
+      self.logger.error(ipp + ' has err ', err);
       self.errors[ipp] = err.code;
     } else {
       // save raw body
@@ -152,7 +152,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
         try {
           self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
         } catch (err) {
-          self.errors[p.public_key] = err.message;
+          self.logger.error(p.public_key + ' has err ', err.message);
         }
       });
     }
