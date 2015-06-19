@@ -1,4 +1,4 @@
-Crawler = require('../src/crawler.js').Crawler
+var Crawler = require('../src/crawler.js').Crawler
 var _ = require('lodash');
 
 var argv = process.argv.slice(2);

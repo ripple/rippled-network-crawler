@@ -5,6 +5,8 @@ var moment = require('moment');
 var EventEmitter = require('events').EventEmitter;
 var ripple = require('ripple-lib');
 var sjcl = ripple.sjcl;
+var check = require('check-types');
+var Promise = require('bluebird')
 
 /* --------------------------------- CONSTS --------------------------------- */
 
@@ -15,7 +17,9 @@ var REQUEST_STATUS = {
   REQUESTING: 2
 };
 
-DEFAULT_PORT = 51235
+var DEFAULT_PORT = 51235
+
+var IPP_PATTERN = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\:([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\b/;
 
 /* --------------------------------- HELPERS -------------------------------- */
 
@@ -61,7 +65,9 @@ function normalizeIpp(ip, port) {
 
     out_ip = splitIp
     out_port = port || splitPort || DEFAULT_PORT
-    ipp = out_ip + ':' + out_port
+    var ipp = out_ip + ':' + out_port
+  } else {
+    throw new Error("ip is undefined")
   }
 
   return ipp
@@ -71,22 +77,45 @@ function normalizeIpp(ip, port) {
 
 function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
-  this.maxRequests = maxRequests ? maxRequests : 30;
+  
+  // maxRequests checks
+  maxRequests = maxRequests ? maxRequests : 30;
+  check.assert.number(maxRequests, "Invalid max requests");
+  if (maxRequests < 1) {
+    throw new Error("Invalid max requests");
+  }
+  
+  // logger checks
+  logger = logger ? logger : console
+  if (!logger.log || !logger.error) {
+    throw new Error("Invalid logger");
+  }
+  if (typeof logger.log != "function" || typeof logger.error != "function") {
+    throw new TypeError("log and error must be functions");
+  }
+
+  this.maxRequests = maxRequests;
   this.currentRequests = 0; // active requests
   this.rawResponses = {}; // {$ip_and_port : $normalised_response}
   this.queued = {}; // {$ip_and_port : REQUEST_STATUS.*}
   this.errors = {}; // {$ip_and_port : $error_code_int}
   this.peersData = {}; // {b58_normed(pubKey) : {...}}
-  this.logger = logger || console;
+  this.logger = logger;
 }
 
 util.inherits(Crawler, EventEmitter);
 
 Crawler.prototype.getCrawl = function(entryIp) {
   var self = this;
-  return new Promise(function(resolve, reject){
+  return new Promise(function(resolve, reject) {
+    if (entryIp === undefined) {
+      throw new Error("Invalid ip address")
+    }
+    if (entryIp.split(' ').length != 1 || !IPP_PATTERN.test(entryIp)) {
+      throw new Error("Invalid ip address (perhaps port missing)")
+    }
     self.once('done', function(response) {
-      resolve(response)
+      return resolve(response)
     }).enter(entryIp)
   })
 }
@@ -120,7 +149,11 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
       // Normalize body and loop over each normalized peer
       body.overlay.active.forEach(function(p) {
-        self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
+        try {
+          self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
+        } catch (err) {
+          self.logger.error(p.public_key + ' has err ', err.message);
+        }
       });
     }
     
