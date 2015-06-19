@@ -1,11 +1,14 @@
-# Ripple Network Crawl
+# Rippled Network Crawler
 
 This crawls the ripple network,
-via making requests to the /crawl endpoint of each peer it can connect to, starting from an entry point. 
-Some peers may know, and publish (perhaps errantly .. ), the ip associated with a peer, while others
-don't. We merge the points of view of each peer, collecting a dict of data, keyed by ip address.
+via making requests to the /crawl endpoint of each peer it can connect to, 
+starting from an entry point. Some peers may know, and publish (perhaps errantly
+.. ), the ip associated with a peer, while others don't. We merge the points of
+view of each peer, collecting a dict of data, keyed by ip address.
 
-This maps out the connections between all rippled servers (not necessarily UNLS) who (for the most part) don't even participate in Consensus or at least don't have any say in influencing the outcome of a transaction on mainnet. 
+This maps out the connections between all rippled servers (not necessarily UNLS)
+who (for the most part) don't even participate in Consensus or at least don't 
+have any say in influencing the outcome of a transaction on mainnet. 
 
 ## Run
 
@@ -22,33 +25,49 @@ Returns a json with the crawl information
 | start      | Crawl start time         |
 | end        | Crawl end time           |
 | entry      | Crawl entry ip:port      |
-| data       | Raw data collected       |
+| data       | Ra`w data collected      |
 | errors     | Errors                   |
+
+##### Example crawl
+
+###### top level structure
 
 ```json
     {
-      "start" : "2015-06-18T16:48:42-07:00",
-      "end" : "2015-06-18T16:48:48-07:00",
-      "entry" : "162.217.98.90:51235",
-      "data" : [
-      	{
-			"ip" : "162.238.30.166",
-			"public_key" : "A6V+H8F0+R5yZKvRumbzLVsK5cZfeL6pIxR7QdoioKjj",
-			"type" : "in",
-			"version" : "rippled-0.28.2-b5"
-		},
-		{
-			...
-		},
-		...
-      ],
-      "errors" : [
-      	{ "98.167.119.231:51235" : "ECONNREFUSED" },
-      	{ "52.4.169.56:51235" : "ETIMEDOUT" },
-      	...
-      ]
+        "start" : "2015-06-18T16:48:42-07:00",
+        "end" : "2015-06-18T16:48:48-07:00",
+        "entry" : "162.217.98.90:51235",
+        "data" : [
+            {   
+                "162.217.98.90:51235" :  { response }
+            },
+            {
+                "72.251.233.165:51235" : { response }
+            },
+            {
+                ...
+            }
+        ],
+        "errors" : [
+            { "98.167.119.231:51235" : "ECONNREFUSED" },
+            { "52.4.169.56:51235" : "ETIMEDOUT" },
+            ...
+        ]
     }
 ```
+
+###### response
+
+```json
+    {
+      "overlay" : {
+        "active"  : [
+          ...
+        ]
+      }
+    }
+```
+
 
 ## Example Usage
 
