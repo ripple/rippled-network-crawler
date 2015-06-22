@@ -15,7 +15,6 @@ function graphify(rawCrawl) {
   var nodes = []
   var links = {}
   var indices = {}
-  var keyToIp = {}
 
   // Collect all unique nodes and save their indices
   for (var ipp in rawCrawl.data) {
@@ -25,7 +24,6 @@ function graphify(rawCrawl) {
     } else {
       nodes.push({ipp: ipp, connections: 0, entry: 0})
     }
-    keyToIp[ipp]
   }
 
   // For each unique node
@@ -86,9 +84,7 @@ function graphify(rawCrawl) {
             }
           }
 
-          if (peer_t && !links[peer_t]) {
-            links[link] = 1
-          }
+          links[link] = 1
         }
 
         //
