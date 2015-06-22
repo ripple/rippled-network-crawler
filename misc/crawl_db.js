@@ -1,6 +1,5 @@
 var Crawler = require('../src/crawler.js').Crawler
 var _ = require('lodash');
-var fs = require('fs');
 var nconf = require('nconf');
 var Sequelize = require('sequelize');
 var Promise = Sequelize.Promise;

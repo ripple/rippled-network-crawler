@@ -25,7 +25,7 @@ Returns a json with the crawl information
 | start      | Crawl start time         |
 | end        | Crawl end time           |
 | entry      | Crawl entry ip:port      |
-| data       | Ra`w data collected      |
+| data       | Raw data collected       |
 | errors     | Errors                   |
 
 ##### Example crawl
