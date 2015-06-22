@@ -17,7 +17,7 @@ if (argv.length == 1) {
 
 function main(entryIp, readable) {
   var noopLogger = {log: _.noop, error: _.noop};
-  var crawler = new Crawler(100, noopLogger)
+  var crawler = new Crawler(100, console)
 
   crawler.getCrawl(entryIp).then(function(response) {
     if (readable)

@@ -137,12 +137,12 @@ Crawler.prototype.crawl = function(ipp, hops) {
   var self = this;
   self.queued[ipp] = REQUEST_STATUS.REQUESTING;
 
-  self.crawlOne(ipp, function(err, response, body) {
+  self.crawlOne(ipp, function(error, response, body) {
     self.dequeue(ipp);
 
-    if (err) {
-      self.logger.error(ipp + ' has err ', err);
-      self.errors[ipp] = err.code;
+    if (error) {
+      self.logger.error(ipp, 'has error:', error);
+      self.errors[ipp] = error;
     } else {
       // save raw body
       self.rawResponses[ipp] = body;
@@ -151,8 +151,8 @@ Crawler.prototype.crawl = function(ipp, hops) {
       body.overlay.active.forEach(function(p) {
         try {
           self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
-        } catch (err) {
-          self.logger.error(p.public_key + ' has err ', err.message);
+        } catch (error) {
+          self.logger.error(p.public_key, 'has error:', error);
         }
       });
     }
