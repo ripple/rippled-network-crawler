@@ -1,7 +1,9 @@
 var Crawler = require('../src/crawler.js').Crawler
 var _ = require('lodash');
+var nconf = require('nconf');
 
-var argv = process.argv.slice(2);
+nconf.argv().env();
+var argv = nconf.get('_')
 
 if (argv.length == 1) {
   main(argv[0], false);
