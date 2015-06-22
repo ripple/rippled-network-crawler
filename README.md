@@ -12,7 +12,10 @@ have any say in influencing the outcome of a transaction on mainnet.
 
 ## Run
 
-`node misc/crawl.js 192.170.145.70:51235`
+``` bash
+npm install 
+node misc/crawl.js 192.170.145.70:51235
+```
 
 ## Response
 
@@ -194,3 +197,14 @@ Boolean flags, set true by presence of environment variable:
 | exceptions | json                     |
 | created_at | timestamp with time zone |
 | updated_at | timestamp with time zone |
+
+## Visualize
+
+``` bash
+npm install 
+npm install -g http-server
+node misc/crawl.js 192.170.145.70:51235 -r > misc/crawls/crawl.json
+node misc/graphify.js misc/crawls/crawl.json > misc/crawls/graph.json
+cd misc/
+http-server -o
+```
