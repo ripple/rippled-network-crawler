@@ -9,7 +9,7 @@ if (argv.length == 1) {
   main(argv[0]);
 } else {
   console.error('eg: node misc/crawl.js 192.170.145.70:51235\n' + 
-                '\t-r: prints out in readable format');
+                '\t--r: prints out in readable format');
   process.exit(1);
 }
 

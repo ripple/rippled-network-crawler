@@ -12,13 +12,9 @@ have any say in influencing the outcome of a transaction on mainnet.
 
 ## Run
 
-<<<<<<< HEAD
-```
-=======
 ``` bash
->>>>>>> 0684ef3... fixed typo in readme
 npm install 
-node misc/crawl.js 192.170.145.70:51235
+node misc/crawl.js 192.170.145.70:51235 --r
 ```
 
 ## Response
