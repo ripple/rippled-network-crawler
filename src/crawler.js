@@ -96,10 +96,10 @@ function Crawler(maxRequests, logger) {
 
   this.maxRequests = maxRequests;
   this.currentRequests = 0; // active requests
-  this.rawResponses = {}; // {$ip_and_port : $normalised_response}
   this.queued = {}; // {$ip_and_port : REQUEST_STATUS.*}
-  this.errors = {}; // {$ip_and_port : $error_code_int}
-  this.peersData = {}; // {b58_normed(pubKey) : {...}}
+  this.done = {}; // {$ip_and_port : 1}
+  this.rawResponses = []; // [{$ip_and_port : $raw_response}]
+  this.errors = []; // {$ip_and_port/public_key : $error_object}
   this.logger = logger;
 }
 
@@ -141,11 +141,22 @@ Crawler.prototype.crawl = function(ipp, hops) {
     self.dequeue(ipp);
 
     if (error) {
+      // save error
+      var err = {}
+      err[ipp] = error;
+      self.errors.push(err);
+
+      // log error
       self.logger.error(ipp, 'has error:', error);
-      self.errors[ipp] = error;
     } else {
+
+      // mark ipp as done (received response)
+      self.done[ipp] = 1;
+
       // save raw body
-      self.rawResponses[ipp] = body;
+      var resp = {};
+      resp[ipp] = body;
+      self.rawResponses.push(resp);
 
       // Normalize body and loop over each normalized peer
       body.overlay.active.forEach(function(p) {
@@ -221,7 +232,7 @@ Crawler.prototype.requestMore = function(hops) {
 */
 Crawler.prototype.enqueueIfNeeded = function(ipp) {
   if (ipp) {
-    if ((this.rawResponses[ipp] === undefined) &&
+    if ((this.done[ipp] === undefined) &&
         (this.queued[ipp] === undefined) &&
         (this.errors[ipp] === undefined)) {
       this.enqueue(ipp);
