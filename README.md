@@ -42,18 +42,21 @@ Returns a json with the crawl information
         "entry" : "162.217.98.90:51235",
         "data" : [
             {   
-                "162.217.98.90:51235" :  { response }
+                "162.217.98.90:51235" :  response
             },
             {
-                "72.251.233.165:51235" : { response }
+                "72.251.233.165:51235" : response
             },
             {
                 ...
             }
         ],
         "errors" : [
-            { "98.167.119.231:51235" : "ECONNREFUSED" },
-            { "52.4.169.56:51235" : "ETIMEDOUT" },
+            { "98.167.119.231:51235" : { "code": "ECONNRESET" } },
+            { "52.4.169.56:51235" :  { "code": "ECONNREFUSED",
+                                       "errno": "ECONNREFUSED",
+                                       "syscall": "connect" } 
+            },
             ...
         ]
     }
