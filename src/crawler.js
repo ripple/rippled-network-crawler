@@ -170,32 +170,6 @@ Crawler.prototype.crawl = function(ipp, hops) {
   });
 };
 
-/**
-*
-* Peers will reveal varying degrees of information about connected peers .Save a
-* given views's data into a merged dict. We take the first view's version we see
-* for any key in the dict
-*
-* TODO: track and warn when peers report conflicting info.
-*
-* @param {String} pk - public key (id) of peer
-* @param {Object} data - one individual view of that peers data
-*
-*/
-Crawler.prototype.savePeerData = function(pk, data, defaults) {
-  var map = this.peersData[pk] !== undefined ? this.peersData[pk] :
-                                               this.peersData[pk] = {};
-
-  _.forOwn(data, function(v, k) {
-    // Type is specific to each point of view. We don't save it, in case we
-    // accidentally try and use it later (don't laugh ... )
-    if (k === 'type' || (defaults && map[k] !== undefined) ) {
-      return;
-    }
-    map[k] = v;
-  });
-};
-
 /*
 * Crawls over one node at ipp and retreives json 
 */
