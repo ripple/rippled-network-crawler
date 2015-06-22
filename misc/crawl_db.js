@@ -50,7 +50,7 @@ function main(entryIp, dbUrl) {
   }
 
   var noopLogger = {log: _.noop, error: _.noop};
-  var crawler = new Crawler(100, nconf.get('LOG_CRAWL') ? undefined : noopLogger)
+  var crawler = new Crawler(100, nconf.get('LOG_CRAWL') ? console : noopLogger)
 
   crawler.getCrawl(entryIp).then(function(crawlJson) {
     saveDB(crawlJson, entryIp, dbUrl, function(error) {
