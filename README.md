@@ -12,11 +12,7 @@ have any say in influencing the outcome of a transaction on mainnet.
 
 ## Run
 
-<<<<<<< HEAD
-```
-=======
 ``` bash
->>>>>>> 0684ef3... fixed typo in readme
 npm install 
 node misc/crawl.js 192.170.145.70:51235
 ```
@@ -201,8 +197,6 @@ Boolean flags, set true by presence of environment variable:
 | exceptions | json                     |
 | created_at | timestamp with time zone |
 | updated_at | timestamp with time zone |
-<<<<<<< HEAD
-=======
 
 ### peers
 

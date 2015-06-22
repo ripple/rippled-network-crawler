@@ -50,7 +50,7 @@ function graphify(rawCrawl) {
         peer_v = peer.version;
         peer_t = peer.type;
 
-        // Fill out info in unique node list
+        // Add missing properties in node list
         peer_node = nodes[peer_i];
 
         //console.error(peer_ipp)
@@ -84,7 +84,9 @@ function graphify(rawCrawl) {
             }
           }
 
-          links[link] = 1
+          if (link) {
+            links[link] = 1
+          }
         }
 
         //
