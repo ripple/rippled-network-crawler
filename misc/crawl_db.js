@@ -11,7 +11,7 @@ nconf.argv().env();
 
 /* --------------------------------- HELPERS -------------------------------- */
 
-var saveDB = exports.saveDB = function saveDB(crawlJson, entryIp, dbUrl, onDone) {
+var saveDB = exports.saveDB = function saveDB(crawlJson, dbUrl, onDone) {
   var sql = new Sequelize(dbUrl, {logging: nconf.get('LOG_SQL') ? console.log : false, dialectOptions: {ssl: true}});
   var models = modelsFactory(sql, Sequelize);
 
@@ -20,7 +20,7 @@ var saveDB = exports.saveDB = function saveDB(crawlJson, entryIp, dbUrl, onDone)
   .then(function() {
     return models.Crawl.create({  start_at: crawlJson.start,
                                   end_at: crawlJson.end,
-                                  entry_ipp: entryIp,
+                                  entry_ipp: crawlJson.entry,
                                   data: crawlJson.data,
                                   exceptions: crawlJson.errors
                                 });
@@ -52,7 +52,7 @@ function main(entryIp, dbUrl) {
   var crawler = new Crawler(100, nconf.get('LOG_CRAWL') ? console : noopLogger)
 
   crawler.getCrawl(entryIp).then(function(crawlJson) {
-    saveDB(crawlJson, entryIp, dbUrl, function(error) {
+    saveDB(crawlJson, dbUrl, function(error) {
         if (error) {
           console.error("Database error:", error);
           process.exit(1);
