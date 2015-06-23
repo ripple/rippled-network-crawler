@@ -12,88 +12,76 @@ if (argv.length == 1) {
   results = crawlInfo(obj);
   console.log(JSON.stringify(results, null, 4));
 } else {
-  console.error('eg: node misc/info.js misc/crawls/crawl1.json');
+  console.error('eg: node misc/info.js misc/crawls/crawl.json');
   process.exit(1);
 }
 
-function crawlInfo(rawCrawl) {
-  results = {rippleds:  {},
-             links:     {},
-             versions:  {},  
-             locations: {},
-             general:   {"nodes": 0}
-            }
-  for (var r_key in rawCrawl.data) {
-    peers = rawCrawl.data[r_key].overlay.active;
-    for (var p_key in peers) {
-      peer = peers[p_key]
-      // A peer (not necessarily unique)
+/*
+* Return all unique rippleds
+* rippleds are keyed by public key
+* and have properties ipp and version
+*/
+function getRippleds(nodes) {
+  var rippleds = {};
+  _.each(nodes, function(node) {
+
+    // node properties
+    var n_ipp = Object.keys(node)[0];
+    var n_peers = node[n_ipp].overlay.active;
+
+    _.each(n_peers, function(peer) {
+
+      // peer properties
+      var p_v = peer.version;
+      var p_pk = normalizePubKey(peer.public_key);
       try {
-        ipp = normalizeIpp(peer.ip, peer.port);
-      } catch (err) {
-        ipp = undefined;
+        var p_ipp = normalizeIpp(peer.ip, peer.port);
+      } catch (error) {
+        var p_ipp = undefined;
       }
 
-      public_key = normalizePubKey(peer.public_key);
-      version = peer.version
-      type = peer.type
-
-      if (ipp != undefined && ipp != "undefined:undefined") {
-        geoloc = geoip.lookup(ipp.split(':')[0])
-        location = geoloc.country + '_' + geoloc.city
+      // Fill in rippled
+      var rippled = rippleds[p_pk]
+      if (rippled) {
+        if(!rippled.ipp)
+          rippled.ipp = p_ipp;
+        if(!rippled.version)
+          rippled.version = p_v;
       } else {
-        location = undefined
+        rippleds[p_pk] = { ipp: p_ipp, version: p_v };
       }
 
-      // unique rippleds
-      if(results.rippleds[public_key] == undefined) {
-        new_rippled = {}
-        results.rippleds[public_key] = { ipp: ipp,
-                                         version: version,
-                                         raw_key: peer.public_key}
+    });
+  });
+  return rippleds;
+}
 
-        // versions
-        if(results.versions[version] == undefined)
-          results.versions[version] = 1;
-        else
-          results.versions[version] += 1;
+function getVersions(rippleds) {
+  var versions = {};
 
-        // locations
-        if(results.locations[location] == undefined)
-          results.locations[location] = 1;
-        else
-          results.locations[location] += 1;
-
-        // general
-        results.general.nodes += 1;
-      }
-
-      // links
-      // Make link
-      var link = undefined
-      if (type) {
-        // Get link
-        if (type == "in") {
-          link = [r_key, ipp]
-        }
-        else if (type == "out") {
-          link = [ipp, r_key]
-        }
-        else if (type == "peer") {
-          if (peer.ip) {
-            if (peer.ip.split(":").length == 2)
-              link = [ipp, r_key]
-            else
-              link = [r_key, ipp]
-          }
-        }
-
-        if (link) {
-          results.links[link] = 1
-        }
-      }
+  _.each(rippleds, function(rippled) {
+    if (versions[rippled.version]) {
+      versions[rippled.version] += 1;
+    } else {
+      versions[rippled.version] = 1;
     }
-  }
-  results.general.connections = Object.keys(results.links).length;
-  return results
+  });
+  return versions;
+}
+
+function crawlInfo(rawCrawl) {
+  var results = { entry: rawCrawl.entry,
+                  rippleds:  {},
+                  links:     {},
+                  versions:  {},  
+                  locations: {},
+                  general:   {"nodes": 0}
+                }
+
+  var nodes = rawCrawl.data;
+  results.rippleds = getRippleds(rawCrawl.data);
+  results.versions = getVersions(results.rippleds);
+  results.general.nodes = Object.keys(results.rippleds).length;
+
+  return results;
 }
