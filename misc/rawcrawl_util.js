@@ -47,6 +47,16 @@ module.exports = {
     return rippleds;
   },
 
+  getRippledsC: function(nodes) {
+    var rippleds = this.getRippleds(nodes);
+    var degrees = this.getDegrees(nodes);
+    _.each(Object.keys(degrees), function(pk) {
+      rippleds[pk].in = degrees[pk].in;
+      rippleds[pk].out = degrees[pk].out;
+    });    
+    return rippleds;
+  },
+
   /*
   * @param {Object} raw crawl
   * @return {Object} { publickey1,publickey2: 1 }

@@ -21,7 +21,7 @@ function graphify(rawCrawl) {
                 }
 
   var pkToIndex = {};
-  var rippleds = rc_util.getRippleds(rawCrawl.data);
+  var rippleds = rc_util.getRippledsC(rawCrawl.data);
   var links = rc_util.getLinks(rawCrawl.data);
 
   _.each(Object.keys(rippleds), function(pk) {

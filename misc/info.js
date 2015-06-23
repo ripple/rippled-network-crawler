@@ -37,14 +37,14 @@ function crawlInfo(rawCrawl) {
                   general:   {},
                   rippleds:  {},
                   links:     {},
-                  degrees: {},
+                  degrees:   {},
                   versions:  {},
                   locations: {}
                 }
 
   var nodes = rawCrawl.data;
 
-  results.rippleds = rc_util.getRippleds(rawCrawl.data);
+  results.rippleds = rc_util.getRippledsC(rawCrawl.data);
 
   results.versions = rc_util.getVersions(rawCrawl.data);
 
