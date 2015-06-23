@@ -160,5 +160,37 @@ module.exports = {
         locations[location] = 1;
     });
     return locations;
+  },
+
+  /*
+  * @param {Object} raw crawl
+  * @return {Object} {public_key: {in: count, out: count}}
+  * Takes a raw crawl and returns the 
+  * in and out degree of each rippled instance.
+  */
+  getDegrees: function(nodes) {
+    var links = this.getLinks(nodes);
+    var connections = {};
+
+    _.each(Object.keys(links), function(link) {
+      var from = link.split(',')[0];
+      var to = link.split(',')[0];
+
+      if (connections[from]) {
+        connections[from].out += 1;
+      } else {
+        connections[from] = {in: 0, out: 0};
+      }
+
+      if (connections[to]) {
+        connections[to].in += 1;
+      } else {
+        connections[to] = {in: 0, out: 0};
+      }
+
+    });
+
+    return connections;
   }
+
 }

@@ -1,6 +1,6 @@
 var fs = require('fs');
 var argv = process.argv.slice(2);
-var rc_util = require('./rawcrawl_util.js')
+var rc_util = require('./rawcrawl_util.js');
 var _ = require('lodash');
 
 if (argv.length == 1) {
