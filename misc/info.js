@@ -27,11 +27,11 @@ function crawlInfo(rawCrawl) {
 
   results.rippleds = rc_util.getRippleds(rawCrawl.data);
 
-  results.versions = rc_util.getVersions(results.rippleds);
+  results.versions = rc_util.getVersions(rawCrawl.data);
 
-  results.locations = rc_util.getLocations(results.rippleds);
+  results.locations = rc_util.getLocations(rawCrawl.data);
 
-  results.links = rc_util.getLinks(results.rippleds, rawCrawl.data);
+  results.links = rc_util.getLinks(rawCrawl.data);
 
   results.general.nodes = Object.keys(results.rippleds).length;
   results.general.links = Object.keys(results.links).length;

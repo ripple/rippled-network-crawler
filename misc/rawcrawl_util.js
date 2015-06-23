@@ -48,15 +48,13 @@ module.exports = {
   },
 
   /*
-  * @param {Object} { public_key: {ipp: ipp, version: version} }
   * @param {Object} raw crawl
   * @return {Object} { publickey1,publickey2: 1 }
-  * Takes raw crawl and Takes a dictionary of unique rippleds keyed by public_key
-  * and returns an object of unique edges in the form "publickey1,publickey2" : 1.
+  * Takes raw crawl and returns an object of unique edges
+  * edges have in the format "publickey1,publickey2" : 1.
   */
-  // NOTE should probably generate rippleds from nodes itself
-  getLinks: function(rippleds, nodes) {
-
+  getLinks: function(nodes) {
+    rippleds = this.getRippleds(nodes);
     // Create ippToPk using rippleds
     ippToPk = {};
     _.each(Object.keys(rippleds), function(pk) {
@@ -119,13 +117,12 @@ module.exports = {
   },
 
   /*
-  * @param {Object} { public_key: {version: version} }
+  * @param {Object} raw crawl
   * @return {Object} { version: count }
-  * Takes a dictionary of unique rippleds keyed by public_key
-  * and returns a dictionary of versions with their counts.
+  * Takes a raw crawl and returns a dictionary of versions with their counts.
   */
-  // NOTE should probably generate rippleds from nodes itself
-  getVersions: function(rippleds) {
+  getVersions: function(nodes) {
+    rippleds = this.getRippleds(nodes);
     var versions = {};
 
     _.each(rippleds, function(rippled) {
@@ -139,13 +136,13 @@ module.exports = {
   },
 
   /*
-  * @param {Object} { public_key: {ipp: ipp} }
+  * @param {Object} raw crawl
   * @return {Object} { location: count }
-  * Takes a dictionary of unique rippleds keyed by public_key
-  * and returns a dictionary of locations with their counts.
+  * Takes a raw crawl and returns a dictionary of locations with their counts.
   * Locations are in the format COUNTRY_CITY (note that city might be missing).
   */
-  getLocations: function(rippleds) {
+  getLocations: function(nodes) {
+    rippleds = this.getRippleds(nodes);
     var locations = {};
 
     _.each(rippleds, function(rippled) {
