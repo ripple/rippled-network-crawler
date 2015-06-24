@@ -17,7 +17,8 @@ module.exports = {
     _.each(nodes, function(node) {
 
       // node properties
-      var n_ipp = Object.keys(node)[0];
+      if (Object.keys(node).length == 1)
+        var n_ipp = Object.keys(node)[0];
       var n_peers = node[n_ipp].overlay.active;
 
       _.each(n_peers, function(peer) {
