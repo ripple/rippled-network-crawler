@@ -1,12 +1,19 @@
 var fs = require('fs');
-var argv = process.argv.slice(2);
 var rc_util = require('./rawcrawl_util.js');
 var _ = require('lodash');
+var nconf = require('nconf');
+
+nconf.argv().env();
+var argv = nconf.get('_')
 
 if (argv.length == 1) {
   var obj = JSON.parse(fs.readFileSync(argv[0], 'utf8'));
   results = graphify(obj);
-  console.log(JSON.stringify(results, null, 4));
+  if (nconf.get('r')) {
+    console.log(JSON.stringify(results, null, 4));
+  } else {
+    console.log(JSON.stringify(results));
+  }
 } else {
   console.error('eg: node misc/graphify.js misc/crawls/crawl.json');
   process.exit(1);
@@ -35,7 +42,7 @@ function graphify(rawCrawl) {
   _.each(Object.keys(links), function(link) {
     var sIndex = pkToIndex[link.split(',')[0]];
     var tIndex = pkToIndex[link.split(',')[1]];
-    if (sIndex && tIndex) {
+    if (sIndex !== undefined && tIndex !== undefined) {
       var newlink = {};
       newlink.source = pkToIndex[link.split(',')[0]];
       newlink.target = pkToIndex[link.split(',')[1]];

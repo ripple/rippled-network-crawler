@@ -192,19 +192,17 @@ module.exports = {
 
     _.each(Object.keys(links), function(link) {
       var from = link.split(',')[0];
-      var to = link.split(',')[0];
+      var to = link.split(',')[1];
 
-      if (connections[from]) {
-        connections[from].out += 1;
-      } else {
+      if (!connections[from]) {
         connections[from] = {in: 0, out: 0};
       }
+      connections[from].out += 1;
 
-      if (connections[to]) {
-        connections[to].in += 1;
-      } else {
+      if (!connections[to]) {
         connections[to] = {in: 0, out: 0};
       }
+      connections[to].in += 1;
 
     });
 

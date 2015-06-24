@@ -15,7 +15,7 @@ if (argv.length == 1) {
 
 function main(entryIp) {
   var noopLogger = {log: _.noop, error: _.noop};
-  var crawler = new Crawler(100, console)
+  var crawler = new Crawler(100, noopLogger)
 
   crawler.getCrawl(entryIp).then(function(response) {
     if (nconf.get('r')) {
@@ -25,6 +25,6 @@ function main(entryIp) {
     }
   })
   .catch(function(error) {
-    console.log('error', error)
+    console.error('error', error)
   })
 }
