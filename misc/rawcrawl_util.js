@@ -47,6 +47,12 @@ module.exports = {
     return rippleds;
   },
 
+  /*
+  * @param {Object} raw crawl
+  * @return {Object} { public_key: {ipp: ipp, version: version, in: count, out: count} }
+  * Takes raw crawl and returns a dictionary of unique rippleds keyed by public
+  * key and with the properties ipp, version, in count and out count.
+  */
   getRippledsC: function(nodes) {
     var rippleds = this.getRippleds(nodes);
     var degrees = this.getDegrees(nodes);
@@ -64,9 +70,9 @@ module.exports = {
   * edges have in the format "publickey1,publickey2" : 1.
   */
   getLinks: function(nodes) {
-    rippleds = this.getRippleds(nodes);
+    var rippleds = this.getRippleds(nodes);
     // Create ippToPk using rippleds
-    ippToPk = {};
+    var ippToPk = {};
     _.each(Object.keys(rippleds), function(pk) {
       var ipp = rippleds[pk].ipp
       if (ipp)
@@ -114,7 +120,7 @@ module.exports = {
             }
           } else {
             // If type is not in/out/peer
-            console.error("shrug");
+            throw new Error("Peer has unexpected type")
           }
 
           links[[a,b]] = 1
@@ -132,7 +138,7 @@ module.exports = {
   * Takes a raw crawl and returns a dictionary of versions with their counts.
   */
   getVersions: function(nodes) {
-    rippleds = this.getRippleds(nodes);
+    var rippleds = this.getRippleds(nodes);
     var versions = {};
 
     _.each(rippleds, function(rippled) {
@@ -152,7 +158,7 @@ module.exports = {
   * Locations are in the format COUNTRY_CITY (note that city might be missing).
   */
   getLocations: function(nodes) {
-    rippleds = this.getRippleds(nodes);
+    var rippleds = this.getRippleds(nodes);
     var locations = {};
 
     _.each(rippleds, function(rippled) {

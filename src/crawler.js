@@ -147,7 +147,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
       self.errors.push(err);
 
       // log error
-      self.logger.error(ipp, 'has error:', error);
+      //self.logger.error(ipp, 'has error:', error);
     } else {
 
       // mark ipp as done (received response)
@@ -163,7 +163,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
         try {
           self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
         } catch (error) {
-          self.logger.error(p.public_key, 'has error:', error);
+          //self.logger.error(p.public_key, 'has error:', error);
         }
       });
     }
