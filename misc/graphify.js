@@ -17,13 +17,13 @@ if (argv.length == 1) {
 */
 function graphify(rawCrawl) {
   var results = { nodes: [], 
-                  links: []
-                }
+                  links: [] }
 
   var pkToIndex = {};
   var rippleds = rc_util.getRippledsC(rawCrawl.data);
   var links = rc_util.getLinks(rawCrawl.data);
 
+  // Fill in nodes and save indices
   _.each(Object.keys(rippleds), function(pk) {
     pkToIndex[pk] = results.nodes.length;
     var node = rippleds[pk];
@@ -31,12 +31,17 @@ function graphify(rawCrawl) {
     results.nodes.push(node);
   });
 
+  // Format links to match d3
   _.each(Object.keys(links), function(link) {
-    var newlink = {};
-    newlink.source = pkToIndex[link.split(',')[0]];
-    newlink.target = pkToIndex[link.split(',')[1]];
-    newlink.value = links[link];
-    results.links.push(newlink)
+    var sIndex = pkToIndex[link.split(',')[0]];
+    var tIndex = pkToIndex[link.split(',')[1]];
+    if (sIndex && tIndex) {
+      var newlink = {};
+      newlink.source = pkToIndex[link.split(',')[0]];
+      newlink.target = pkToIndex[link.split(',')[1]];
+      newlink.value = links[link];
+      results.links.push(newlink);
+    }
   });
 
   return results;

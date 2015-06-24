@@ -17,8 +17,7 @@ module.exports = {
     _.each(nodes, function(node) {
 
       // node properties
-      if (Object.keys(node).length == 1)
-        var n_ipp = Object.keys(node)[0];
+      var n_ipp = Object.keys(node)[0];
       var n_peers = node[n_ipp].overlay.active;
 
       _.each(n_peers, function(peer) {
@@ -58,8 +57,10 @@ module.exports = {
     var rippleds = this.getRippleds(nodes);
     var degrees = this.getDegrees(nodes);
     _.each(Object.keys(degrees), function(pk) {
-      rippleds[pk].in = degrees[pk].in;
-      rippleds[pk].out = degrees[pk].out;
+      if (rippleds[pk]) {
+        rippleds[pk].in = degrees[pk].in;
+        rippleds[pk].out = degrees[pk].out;
+      }
     });    
     return rippleds;
   },
