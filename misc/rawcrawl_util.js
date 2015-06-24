@@ -125,7 +125,12 @@ module.exports = {
             throw new Error("Peer has unexpected type")
           }
 
-          links[[a,b]] = 1
+          if (a !== undefined && b !== undefined) {
+            if (links[[a,b]] === undefined) {
+              links[[a,b]] = 0;
+            }
+            links[[a,b]] += 1;
+          }
         }
 
       });
