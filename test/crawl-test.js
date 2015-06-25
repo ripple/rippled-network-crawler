@@ -79,10 +79,10 @@ describe('Crawler', function() {
         expect(data.entry).to.be.a('string');
 
         expect(data).to.have.property('data');
-        expect(data.data).to.be.an('object');
+        expect(data.data).to.be.an('array');
 
         expect(data).to.have.property('errors');
-        expect(data.errors).to.be.an('object');
+        expect(data.errors).to.be.an('array');
       })
       .then(done, done);
     });
@@ -102,10 +102,10 @@ describe('Crawler', function() {
         expect(data.entry).to.be.a('string');
 
         expect(data).to.have.property('data');
-        expect(data.data).to.be.an('object');
+        expect(data.data).to.be.an('array');
 
         expect(data).to.have.property('errors');
-        expect(data.errors).to.be.an('object');
+        expect(data.errors).to.be.an('array');
       })
       .then(done, done);
     });

@@ -1,122 +1,55 @@
-var _ = require('lodash');
 var fs = require('fs');
-var geoip = require('geoip-lite');
-var crawler = require('../src/crawler.js');
-var normalizeIpp = crawler.normalizeIpp;
-var normalizePubKey = crawler.normalizePubKey;
+var rc_util = require('./rawcrawl_util.js');
+var _ = require('lodash');
+var nconf = require('nconf');
 
-var rawCrawl = require('../' + process.argv.slice(2)[0]);
+nconf.argv().env();
+var argv = nconf.get('_')
 
-function graphify(rawCrawl) {
-
-  var out = {nodes: [], links: [], iplinks: []}
-
-  // storage
-  var nodes = []
-  var links = {}
-  var indices = {}
-
-  // Collect all unique nodes and save their indices
-  for (var ipp in rawCrawl.data) {
-    indices[ipp] = nodes.length
-    if (nodes.length == 0) {
-      nodes.push({ipp: ipp, connections: 0, entry: 1})
-    } else {
-      nodes.push({ipp: ipp, connections: 0, entry: 0})
-    }
+if (argv.length == 1) {
+  var obj = JSON.parse(fs.readFileSync(argv[0], 'utf8'));
+  results = graphify(obj);
+  if (nconf.get('r')) {
+    console.log(JSON.stringify(results, null, 4));
+  } else {
+    console.log(JSON.stringify(results));
   }
-
-  // For each unique node
-  for(i in nodes) {
-    node = nodes[i];
-    ipp = node.ipp;
-    peers = rawCrawl.data[ipp].overlay.active;
-
-    // For each (not necessarily unique) peer
-    for (p_index in peers) {
-      peer = peers[p_index];
-
-      // Get ipp
-      try {
-        peer_ipp = normalizeIpp(peer.ip, peer.port);
-      } catch (err) {
-        peer_ipp = undefined;
-      }
-      peer_i = indices[peer_ipp];
-
-      // If it has an ipp
-      if (peer_ipp && peer_i !== undefined) {
-        peer_pk = normalizePubKey(peer.public_key);
-        peer_v = peer.version;
-        peer_t = peer.type;
-
-        // Add missing properties in node list
-        peer_node = nodes[peer_i];
-
-        //console.error(peer_ipp)
-        if (!peer_node.pk) {
-          peer_node.pk = peer_pk
-        }
-        if (!peer_node.v) {
-          peer_node.v = peer_v
-        }
-        if (!peer_node.loc) {
-          geoloc = geoip.lookup(peer_ipp.split(':')[0])
-          peer_node.loc = geoloc.country + '_' + geoloc.city
-        }
-
-        // Make link
-        var link = undefined
-        if (peer_t) {
-          // Get link
-          if (peer_t == "in") {
-            link = [i, peer_i]
-          }
-          else if (peer_t == "out") {
-            link = [peer_i, i]
-          }
-          else if (peer_t == "peer") {
-            if (peer.ip) {
-              if (peer.ip.split(":").length == 2)
-                link = [peer_i, i]
-              else
-                link = [i, peer_i]
-            }
-          }
-
-          if (link) {
-            links[link] = 1
-          }
-        }
-
-        //
-
-      } else {
-        // No ip address, can't really do much
-      }
-
-    }
-
-  }
-
-  // Ready to write to out
-
-  // links
-  for (link in links) {
-    var st = link.split(','),
-        s = parseInt(st[0]),
-        t = parseInt(st[1])
-
-    out.links.push({source: s, target: t, value: links[link]});
-    out.iplinks.push({source: nodes[s].ipp, target: nodes[t].ipp, value: links[link]});
-    nodes[s].connections += 1;
-    //nodes[t].connections += 1;
-  }
-
-  // nodes
-  out.nodes = nodes
-
-  return out
+} else {
+  console.error('eg: node misc/graphify.js misc/crawls/crawl.json');
+  process.exit(1);
 }
 
-console.log(JSON.stringify(graphify(rawCrawl), null, 4))
+/*
+* Returns metrics of raw crawl
+*/
+function graphify(rawCrawl) {
+  var results = { nodes: [], 
+                  links: [] }
+
+  var pkToIndex = {};
+  var rippleds = rc_util.getRippledsC(rawCrawl.data);
+  var links = rc_util.getLinks(rawCrawl.data);
+
+  // Fill in nodes and save indices
+  _.each(Object.keys(rippleds), function(pk) {
+    pkToIndex[pk] = results.nodes.length;
+    var node = rippleds[pk];
+    node.public_key = pk;
+    results.nodes.push(node);
+  });
+
+  // Format links to match d3
+  _.each(Object.keys(links), function(link) {
+    var sIndex = pkToIndex[link.split(',')[0]];
+    var tIndex = pkToIndex[link.split(',')[1]];
+    if (sIndex !== undefined && tIndex !== undefined) {
+      var newlink = {};
+      newlink.source = pkToIndex[link.split(',')[0]];
+      newlink.target = pkToIndex[link.split(',')[1]];
+      newlink.value = links[link];
+      results.links.push(newlink);
+    }
+  });
+
+  return results;
+}

@@ -17,7 +17,7 @@ var REQUEST_STATUS = {
   REQUESTING: 2
 };
 
-var DEFAULT_PORT = 51235
+var DEFAULT_PORT = undefined
 
 var IPP_PATTERN = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\:([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\b/;
 
@@ -63,14 +63,16 @@ function normalizeIpp(ip, port) {
         splitIp = split[0],
         splitPort = split[1];
 
-    out_ip = splitIp
-    out_port = port || splitPort || DEFAULT_PORT
-    var ipp = out_ip + ':' + out_port
-  } else {
-    throw new Error("ip is undefined")
+    var out_ip = splitIp
+    var out_port = port || splitPort || DEFAULT_PORT
+    if (out_port) {
+      var ipp = out_ip + ':' + out_port
+      return ipp;
+    }
   }
 
-  return ipp
+  throw new Error("ip is undefined");
+  return;
 }
 
 /* --------------------------------- CRAWLER -------------------------------- */
@@ -96,10 +98,10 @@ function Crawler(maxRequests, logger) {
 
   this.maxRequests = maxRequests;
   this.currentRequests = 0; // active requests
-  this.rawResponses = {}; // {$ip_and_port : $normalised_response}
   this.queued = {}; // {$ip_and_port : REQUEST_STATUS.*}
-  this.errors = {}; // {$ip_and_port : $error_code_int}
-  this.peersData = {}; // {b58_normed(pubKey) : {...}}
+  this.done = {}; // {$ip_and_port : 1}
+  this.rawResponses = []; // [{$ip_and_port : $raw_response}]
+  this.errors = []; // {$ip_and_port/public_key : $error_object}
   this.logger = logger;
 }
 
@@ -137,22 +139,33 @@ Crawler.prototype.crawl = function(ipp, hops) {
   var self = this;
   self.queued[ipp] = REQUEST_STATUS.REQUESTING;
 
-  self.crawlOne(ipp, function(err, response, body) {
+  self.crawlOne(ipp, function(error, response, body) {
     self.dequeue(ipp);
 
-    if (err) {
-      self.logger.error(ipp + ' has err ', err);
-      self.errors[ipp] = err.code;
+    if (error) {
+      // save error
+      var err = {}
+      err[ipp] = error;
+      self.errors.push(err);
+
+      // log error
+      //self.logger.error(ipp, 'has error:', error);
     } else {
+
+      // mark ipp as done (received response)
+      self.done[ipp] = 1;
+
       // save raw body
-      self.rawResponses[ipp] = body;
+      var resp = {};
+      resp[ipp] = body;
+      self.rawResponses.push(resp);
 
       // Normalize body and loop over each normalized peer
       body.overlay.active.forEach(function(p) {
         try {
           self.enqueueIfNeeded(normalizeIpp(p.ip, p.port));
-        } catch (err) {
-          self.logger.error(p.public_key + ' has err ', err.message);
+        } catch (error) {
+          //self.logger.error(p.public_key, 'has error:', error);
         }
       });
     }
@@ -167,32 +180,6 @@ Crawler.prototype.crawl = function(ipp, hops) {
                           errors:   self.errors
                         });
     }
-  });
-};
-
-/**
-*
-* Peers will reveal varying degrees of information about connected peers .Save a
-* given views's data into a merged dict. We take the first view's version we see
-* for any key in the dict
-*
-* TODO: track and warn when peers report conflicting info.
-*
-* @param {String} pk - public key (id) of peer
-* @param {Object} data - one individual view of that peers data
-*
-*/
-Crawler.prototype.savePeerData = function(pk, data, defaults) {
-  var map = this.peersData[pk] !== undefined ? this.peersData[pk] :
-                                               this.peersData[pk] = {};
-
-  _.forOwn(data, function(v, k) {
-    // Type is specific to each point of view. We don't save it, in case we
-    // accidentally try and use it later (don't laugh ... )
-    if (k === 'type' || (defaults && map[k] !== undefined) ) {
-      return;
-    }
-    map[k] = v;
   });
 };
 
@@ -247,7 +234,7 @@ Crawler.prototype.requestMore = function(hops) {
 */
 Crawler.prototype.enqueueIfNeeded = function(ipp) {
   if (ipp) {
-    if ((this.rawResponses[ipp] === undefined) &&
+    if ((this.done[ipp] === undefined) &&
         (this.queued[ipp] === undefined) &&
         (this.errors[ipp] === undefined)) {
       this.enqueue(ipp);
