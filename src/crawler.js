@@ -63,14 +63,16 @@ function normalizeIpp(ip, port) {
         splitIp = split[0],
         splitPort = split[1];
 
-    out_ip = splitIp
-    out_port = port || splitPort || DEFAULT_PORT
-    var ipp = out_ip + ':' + out_port
-  } else {
-    throw new Error("ip is undefined")
+    var out_ip = splitIp
+    var out_port = port || splitPort
+    if (out_port) {
+      var ipp = out_ip + ':' + out_port
+      return ipp;
+    }
   }
 
-  return ipp
+  throw new Error("ip is undefined");
+  return;
 }
 
 /* --------------------------------- CRAWLER -------------------------------- */
