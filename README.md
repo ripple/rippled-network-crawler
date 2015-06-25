@@ -206,8 +206,8 @@ Boolean flags, set true by presence of environment variable:
 ``` bash
 npm install 
 npm install -g http-server
-node misc/crawl.js 192.170.145.70:51235 -r > misc/crawls/crawl.json
-node misc/graphify.js misc/crawls/crawl.json > misc/crawls/graph.json
+node misc/crawl.js 192.170.145.70:51235 --r > misc/crawls/crawl.json
+node misc/graphify.js misc/crawls/crawl.json --r > misc/crawls/graph.json
 cd misc/
 http-server -o
 ```
