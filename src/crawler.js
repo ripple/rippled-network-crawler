@@ -17,7 +17,7 @@ var REQUEST_STATUS = {
   REQUESTING: 2
 };
 
-var DEFAULT_PORT = 51235
+var DEFAULT_PORT = undefined
 
 var IPP_PATTERN = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\:([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\b/;
 
@@ -64,10 +64,12 @@ function normalizeIpp(ip, port) {
         splitPort = split[1];
 
     var out_ip = splitIp
-    var out_port = port || splitPort
+    var out_port = port || splitPort || DEFAULT_PORT
     if (out_port) {
       var ipp = out_ip + ':' + out_port
       return ipp;
+    } else {
+      console.error("no port", out_port)
     }
   }
 
