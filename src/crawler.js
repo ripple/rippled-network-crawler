@@ -68,8 +68,6 @@ function normalizeIpp(ip, port) {
     if (out_port) {
       var ipp = out_ip + ':' + out_port
       return ipp;
-    } else {
-      console.error("no port", out_port)
     }
   }
 
