@@ -99,6 +99,7 @@ module.exports = {
           var p_ipp = undefined;
         }
 
+        var a,b;
         // Make link
         if (p_type) {
           // Get link
