@@ -77,6 +77,11 @@ function normalizeIpp(ip, port) {
 
 /* --------------------------------- CRAWLER -------------------------------- */
 
+/*
+* @param {Integer} max number of requests crawler will make at a time
+* @param {Logger} logger that crawler uses (should have .log and .error functions)
+* Crawler constructor
+*/
 function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
   
@@ -104,9 +109,13 @@ function Crawler(maxRequests, logger) {
   this.errors = []; // {$ip_and_port/public_key : $error_object}
   this.logger = logger;
 }
-
 util.inherits(Crawler, EventEmitter);
 
+/*
+* @param {String} ipp - ip and port to crawl
+* Initiate complete crawl starting from entryIp and
+* returns results and errors in a promise.
+*/
 Crawler.prototype.getCrawl = function(entryIp) {
   var self = this;
   return new Promise(function(resolve, reject) {
@@ -118,32 +127,53 @@ Crawler.prototype.getCrawl = function(entryIp) {
     }
     self.once('done', function(response) {
       return resolve(response)
-    }).enter(entryIp)
+    }).enter(withDefaultPort(entryIp))
   })
 }
 
-Crawler.prototype.getSelCrawl = function(entryIpps) {
+/*
+* @param {String} ipp - ip and port to crawl
+* Initiate selective crawl at ipps and
+* return results and errors in a promise.
+* Selective means that crawl won't expand
+* to peers of each node. The only requests that 
+* will be gathered are from ipps' /crawl endpoints.
+*/
+Crawler.prototype.getSelCrawl = function(ipps) {
   var self = this;
   return new Promise(function(resolve, reject) {
     self.once('done', function(response) {
       return resolve(response)
-    }).crawlSelective(entryIpps)
+    }).crawlSelective(_.map(ipps, withDefaultPort));
   });
 }
 
+/*
+* @param {String} ipp to start crawl on
+* Start crawl
+*/
+Crawler.prototype.enter = function(ipp) {
+  this.startTime = moment().format();
+  this.entryIP = ipp;
+  this.crawl(ipp, 0);
+}
 
 /*
-* Enter at ip to start crawl
+* @param {Array} ipps to crawl
+* Start selective crawl
 */
-Crawler.prototype.enter = function(ip) {
+Crawler.prototype.enterSel = function(ipps) {
   this.startTime = moment().format();
-  this.entryIP = withDefaultPort(ip);
-  this.crawl(withDefaultPort(ip), 0);
-};
+  this.entryIP = ipps;
+  this.crawlSelective(ipps);
+}
 
 /*
 * @param {String} ipp - ip and port to crawl
 * @param {Number} hops - from initial entryPoint
+* Collect crawl reponses from ipp
+* and expand crawl to its peers recursively
+* while keeping track of hops (distance from inital entry point)
 */
 Crawler.prototype.crawl = function(ipp, hops) {
   var self = this;
@@ -192,8 +222,8 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
 /*
 * @param {Array} ipps - Array of ipps
-* Will collect crawl reponses from ipps
-* but not expand crawl to their peers
+* Collect crawl reponses from ipps
+* without expanding crawl to their peers
 */
 Crawler.prototype.crawlSelective = function(ipps) {
   var self = this;
