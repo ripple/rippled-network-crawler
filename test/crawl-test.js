@@ -52,9 +52,13 @@ describe('Crawler', function() {
       var crawler = new Crawler(100)
       var entryIP = undefined
 
+<<<<<<< HEAD
       crawler.getCrawl(entryIP).catch(function(error) {
         assert.strictEqual(error.message, "Invalid string");
       })
+=======
+      crawler.getCrawl(entryIP).catch(function(error) {})
+>>>>>>> added tests for getSelCrawl and caused bug in crawl_db
       .then(done, done);
     });
     it('Should throw an error when given invalid ip address', function(done) {
