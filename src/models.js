@@ -16,7 +16,7 @@ var create = module.exports = function(sql, Sequelize) {
       type: Sequelize.DATE
     },
     entry_ipp: { 
-      type: Sequelize.STRING
+      type: Sequelize.ARRAY
     },
     data: {
       type: Sequelize.JSON

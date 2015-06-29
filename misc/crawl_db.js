@@ -52,13 +52,15 @@ function main(entryIp, dbUrl) {
   var crawler = new Crawler(100, nconf.get('LOG_CRAWL') ? console : noopLogger)
 
   crawler.getCrawl(entryIp).then(function(crawlJson) {
+    //console.log(JSON.stringify(crawlJson, null, 4));
     saveDB(crawlJson, dbUrl, function(error) {
-        if (error) {
-          console.error("Database error:", error);
-          process.exit(1);
-        } else {
-          process.exit(0);
-        }
+      if (error) {
+        console.error("Database error:", error);
+        process.exit(1);
+      } else {
+        console.log("Saved to db");
+        process.exit(0);
+      }
     });
   })
   .catch(function(error) {
