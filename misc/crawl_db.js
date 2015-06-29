@@ -13,20 +13,20 @@ nconf.argv().env();
 
 var saveDB = exports.saveDB = function saveDB(crawlJson, dbUrl, onDone) {
   var sql = new Sequelize(dbUrl, {logging: nconf.get('LOG_SQL') ? console.log : false, dialectOptions: {ssl: true}});
-  var models = modelsFactory(sql, Sequelize);
+  var models = modelsFactory(sql);
 
   sql
   .sync({force: nconf.get('DROP_TABLES')})
   .then(function() {
-    return models.Crawl.create({  start_at: crawlJson.start,
-                                  end_at: crawlJson.end,
-                                  entry_ipp: crawlJson.entry,
-                                  data: crawlJson.data,
-                                  exceptions: crawlJson.errors
-                                });
+    return models.Crawl.create({ start_at: crawlJson.start,
+                          end_at: crawlJson.end,
+                          entry_ipp: crawlJson.entry,
+                          data: crawlJson.data,
+                          exceptions: crawlJson.errors
+                        });
   }).then(function() {
     onDone(null);
-  })
+  })  
   .catch(function(error) {
     onDone(error);
   });
@@ -51,14 +51,15 @@ function main(entryIp, dbUrl) {
   var noopLogger = {log: _.noop, error: _.noop};
   var crawler = new Crawler(100, nconf.get('LOG_CRAWL') ? console : noopLogger)
 
-  crawler.getCrawl(entryIp).then(function(crawlJson) {
+  crawler.getSelCrawl(entryIp).then(function(crawlJson) {
     saveDB(crawlJson, dbUrl, function(error) {
-        if (error) {
-          console.error("Database error:", error);
-          process.exit(1);
-        } else {
-          process.exit(0);
-        }
+      if (error) {
+        console.error("Database error:", error);
+        process.exit(1);
+      } else {
+        console.log("Saved to database");
+        process.exit(0);
+      }
     });
   })
   .catch(function(error) {

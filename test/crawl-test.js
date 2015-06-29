@@ -37,14 +37,22 @@ describe('Crawler', function() {
     });
   });
   describe('#getCrawl()', function() {
+    // type
+    it('Should throw an error when not given string', function(done) {
+      var crawler = new Crawler(100)
+      var entryIP = 123
+
+      crawler.getCrawl(entryIP).catch(function(error) {
+        assert.strictEqual(error.message, "Invalid string")
+      })
+      .then(done, done);
+    });    
     // ip address
     it('Should throw an error when given undefined ip address', function(done) {
       var crawler = new Crawler(100)
       var entryIP = undefined
 
-      crawler.getCrawl(entryIP).catch(function(error) {
-        assert.strictEqual(error.message, "Invalid ip address")
-      })
+      crawler.getCrawl(entryIP).catch(function(error) {})
       .then(done, done);
     });
     it('Should throw an error when given invalid ip address', function(done) {
@@ -92,6 +100,99 @@ describe('Crawler', function() {
       var entryIP = '212.83.147.166:51235'
 
       crawler.getCrawl(entryIP).then(function(data) {
+        expect(data).to.have.property('start');
+        expect(data.start).to.be.a('string');
+
+        expect(data).to.have.property('end');
+        expect(data.end).to.be.a('string');
+
+        expect(data).to.have.property('entry');
+        expect(data.entry).to.be.a('string');
+
+        expect(data).to.have.property('data');
+        expect(data.data).to.be.an('array');
+
+        expect(data).to.have.property('errors');
+        expect(data.errors).to.be.an('array');
+      })
+      .then(done, done);
+    });
+  });
+  describe('#getSelCrawl()', function() {
+    // type
+    it('Should throw an error when not given array', function(done) {
+      var crawler = new Crawler(100)
+      var ipps = 123
+
+      crawler.getSelCrawl(ipps).catch(function(error) {
+        assert.strictEqual(error.message, "Invalid array")
+      })
+      .then(done, done);
+    });
+    // ip address
+    it('Should throw an error when not given string for ip address', function(done) {
+      var crawler = new Crawler(100)
+      var ipps = ["192.170.145.70:51235", 123]
+
+      crawler.getSelCrawl(ipps).catch(function(error) {
+        assert.strictEqual(error.message, "Invalid string")
+      })
+      .then(done, done);
+    });    
+    it('Should throw an error when given any undefined ip address', function(done) {
+      var crawler = new Crawler(100)
+      var ipps = ["192.170.145.70:51235", undefined]
+
+      crawler.getSelCrawl(ipps).catch(function(error) {})
+      .then(done, done);
+    });
+    it('Should throw an error when given invalid ip address', function(done) {
+      var crawler = new Crawler(100)
+      var ipps = ["192.170.145.70:51235", "123"]
+
+      return crawler.getSelCrawl(ipps).catch(function(error) {
+          assert.strictEqual(error.message, "Invalid ip address (perhaps port missing)")
+      })
+      .then(done, done);
+    });
+    it('Should throw an error when given ip address without port', function(done) {
+      var crawler = new Crawler(100)
+      var ipps = ["192.170.145.70:51235", "192.170.145.70"]
+
+      return crawler.getSelCrawl(ipps).catch(function(error) {
+          assert.strictEqual(error.message, "Invalid ip address (perhaps port missing)")
+      })
+      .then(done, done);
+    });
+    it('Should return an object with valid properties when given valid ip address', function(done) {
+      this.timeout(10000)
+      var crawler = new Crawler(100)
+      var ipps = ["192.170.145.70:51235", "74.201.214.198:51235"]
+
+      crawler.getSelCrawl(ipps).then(function(data) {
+        expect(data).to.have.property('start');
+        expect(data.start).to.be.a('string');
+
+        expect(data).to.have.property('end');
+        expect(data.end).to.be.a('string');
+
+        expect(data).to.have.property('entry');
+        expect(data.entry).to.be.a('string');
+
+        expect(data).to.have.property('data');
+        expect(data.data).to.be.an('array');
+
+        expect(data).to.have.property('errors');
+        expect(data.errors).to.be.an('array');
+      })
+      .then(done, done);
+    });
+    it('Should return an object with valid properties when given unreachable but valid ip address', function(done) {
+      this.timeout(10000)
+      var crawler = new Crawler(100)
+      var ipps = ["192.170.145.70:51235", "74.201.214.198:51235"]
+
+      crawler.getSelCrawl(ipps).then(function(data) {
         expect(data).to.have.property('start');
         expect(data.start).to.be.a('string');
 

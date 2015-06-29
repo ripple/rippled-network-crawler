@@ -79,7 +79,7 @@ function normalizeIpp(ip, port) {
 
 /*
 * @param {Integer} max number of requests crawler will make at a time
-* @param {Logger} logger that crawler uses (should have .log and .error functions)
+* @param {Logger} logger that crawler uses (should have .log .error functions)
 * Crawler constructor
 */
 function Crawler(maxRequests, logger) {
@@ -119,6 +119,7 @@ util.inherits(Crawler, EventEmitter);
 Crawler.prototype.getCrawl = function(entryIp) {
   var self = this;
   return new Promise(function(resolve, reject) {
+    check.assert.string(entryIp);
     if (entryIp === undefined) {
       throw new Error("Invalid ip address")
     }
@@ -132,7 +133,7 @@ Crawler.prototype.getCrawl = function(entryIp) {
 }
 
 /*
-* @param {String} ipp - ip and port to crawl
+* @param {Array} ipps - ip and port to crawl
 * Initiate selective crawl at ipps and
 * return results and errors in a promise.
 * Selective means that crawl won't expand
@@ -142,9 +143,19 @@ Crawler.prototype.getCrawl = function(entryIp) {
 Crawler.prototype.getSelCrawl = function(ipps) {
   var self = this;
   return new Promise(function(resolve, reject) {
+    check.assert.array(ipps);
+    _.each(ipps, function(ipp) {
+      check.assert.string(ipp);
+      if (ipp === undefined) {
+        throw new Error("Invalid ip address")
+      }
+      if (ipp.split(' ').length != 1 || !IPP_PATTERN.test(ipp)) {
+        throw new Error("Invalid ip address (perhaps port missing)")
+      }
+    });
     self.once('done', function(response) {
       return resolve(response)
-    }).crawlSelective(_.map(ipps, withDefaultPort));
+    }).enterSel(_.map(ipps, withDefaultPort));
   });
 }
 
@@ -164,7 +175,7 @@ Crawler.prototype.enter = function(ipp) {
 */
 Crawler.prototype.enterSel = function(ipps) {
   this.startTime = moment().format();
-  this.entryIP = ipps;
+  this.entryIP = ipps.toString();
   this.crawlSelective(ipps);
 }
 
