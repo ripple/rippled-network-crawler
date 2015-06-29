@@ -213,6 +213,20 @@ module.exports = {
     });
 
     return connections;
-  }
+  },
 
+  /*
+  * @param {Object} raw crawl
+  * @return {Array} ipp
+  * Takes a raw crawl and returns an 
+  * array of the ipps which were crawled
+  */
+  getIpps: function(nodes) {
+    var ipps = [];
+    _.each(nodes, function(crawl) {
+      ipps.push(Object.keys(crawl)[0]);
+    });
+
+    return ipps;
+  }
 }
