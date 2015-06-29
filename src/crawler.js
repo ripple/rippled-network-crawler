@@ -54,7 +54,7 @@ function normalizePubKey(pubKeyStr) {
 }
 
 /*
-* deals with a variety of (ip, port) possibilities that occur 
+* Deals with a variety of (ip, port) possibilities that occur 
 * in rippled responses and normalizes them to the format 'ip:port'
 */
 function normalizeIpp(ip, port) {
@@ -122,6 +122,16 @@ Crawler.prototype.getCrawl = function(entryIp) {
   })
 }
 
+Crawler.prototype.getSelCrawl = function(entryIpps) {
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    self.once('done', function(response) {
+      return resolve(response)
+    }).crawlSelective(entryIpps)
+  });
+}
+
+
 /*
 * Enter at ip to start crawl
 */
@@ -131,7 +141,7 @@ Crawler.prototype.enter = function(ip) {
   this.crawl(withDefaultPort(ip), 0);
 };
 
-/**
+/*
 * @param {String} ipp - ip and port to crawl
 * @param {Number} hops - from initial entryPoint
 */
@@ -140,6 +150,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
   self.queued[ipp] = REQUEST_STATUS.REQUESTING;
 
   self.crawlOne(ipp, function(error, response, body) {
+
     self.dequeue(ipp);
 
     if (error) {
@@ -147,11 +158,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
       var err = {}
       err[ipp] = error;
       self.errors.push(err);
-
-      // log error
-      //self.logger.error(ipp, 'has error:', error);
     } else {
-
       // mark ipp as done (received response)
       self.done[ipp] = 1;
 
@@ -182,6 +189,48 @@ Crawler.prototype.crawl = function(ipp, hops) {
     }
   });
 };
+
+/*
+* @param {Array} ipps - Array of ipps
+* Will collect crawl reponses from ipps
+* but not expand crawl to their peers
+*/
+Crawler.prototype.crawlSelective = function(ipps) {
+  var self = this;
+  this.startTime = moment().format();
+  _.each(ipps, function(ipp) {
+    self.enqueueIfNeeded(ipp);
+    self.crawlOne(ipp, function(error, response, body) {
+      self.dequeue(ipp);
+      if (error) {
+        // save error
+        var err = {}
+        err[ipp] = error;
+        self.errors.push(err);
+        //console.error(error);
+      } else {
+        // mark ipp as done (received response)
+        self.done[ipp] = 1;
+
+        // save raw body
+        var resp = {};
+        resp[ipp] = body;
+        self.rawResponses.push(resp);
+      }
+
+      // End if all responses received
+      if (Object.keys(self.queued).length == 0) {
+        self.endTime = moment().format();
+        self.emit('done', { start:    self.startTime,
+                            end:      self.endTime,
+                            entry:    self.entryIP,
+                            data:     self.rawResponses,
+                            errors:   self.errors
+                          });
+      }
+    });
+  });
+}
 
 /*
 * Crawls over one node at ipp and retreives json 
