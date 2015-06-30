@@ -10,30 +10,89 @@ This maps out the connections between all rippled servers (not necessarily UNLS)
 who (for the most part) don't even participate in Consensus or at least don't 
 have any say in influencing the outcome of a transaction on mainnet. 
 
-## Run
+## Run crawl.js
 
+Example
 ``` bash
 npm install 
-node misc/crawl.js 192.170.145.70:51235 --r
+node src/crawl.js 192.170.145.70:51235 --readable
 ```
 
-## Response
 
-Returns a json with the crawl information
+```
+$DATABASE_URL=postgres://postgres:zxccxz@localhost:5432/crawl
+node src/crawl.js --prior --store
+```
 
-##### JSON structure
+### Options
 
-|   Field    |    Description           |
-|------------|--------------------------|
-| start      | Crawl start time         |
-| end        | Crawl end time           |
-| entry      | Crawl entry ip:port      |
-| data       | Raw data collected       |
-| errors     | Errors                   |
+* #### < entry ipp >
 
-##### Example crawl
+    Must be in the format `ip:port`
+    ```
+    node src/crawl.js 192.170.145.70:51235 
+    ```
 
-###### top level structure
+* #### --readable
+
+    Output json with four space indentation.
+
+* #### --selective
+
+    Crawl specified ipps without expanding crawl to peers of each rippled instance.
+
+    Ipps are read from stdin.
+
+    ```
+    node src/crawl.js --selective < ipps.txt
+    ```
+
+* #### --store
+
+    Stores crawl output into the database.
+    
+    Database specified by `$DATABASE_URL`.
+    
+    See [schema](#schema) for details.
+    
+* #### --prior
+
+    Crawls selectively based on ipps from latest crawl in the database.
+    
+    Database specified by `$DATABASE_URL`.
+
+* #### --logcrawl
+
+  Log crawl.
+
+* #### --logsql
+
+  Log all sequelize queries and ddl.
+
+* #### $DATABASE_URL
+
+  For example `postgres://postgres:zxccxz@localhost:5432/crawl`
+
+* #### $MAX_CONNECTIONS
+
+  Max number of http requests to have open at once.
+
+  Default is 100.
+
+
+## Output structure
+
+`crawl.js` outputs a stringified json in the following format:
+
+|   Field    |    Description           | Type   |
+|------------|--------------------------|--------|
+| start      | Crawl start time         | date   |
+| end        | Crawl end time           | date   |
+| entry      | Crawl entry ip:port      | string |
+| data       | Raw data collected       | array  |
+| errors     | Errors                   | array  |
+
+### Example output
 
 ```json
     {
@@ -62,34 +121,29 @@ Returns a json with the crawl information
     }
 ```
 
-###### response
+Response format described [here](#response).
 
-```json
-    {
-      "overlay" : {
-        "active"  : [
-          ...
-        ]
-      }
-    }
-```
+## Schema
+
+### crawl
+
+|   Column   |           Type           |
+|------------|--------------------------|
+| id         | bigint                   |
+| start_at   | timestamp with time zone |
+| end_at     | timestamp with time zone |
+| entry_ipp  | string                   |
+| data       | json                     |
+| exceptions | json                     |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+## Info
+
+## Visualize
 
 
-## Example Usage
-
-``` javascript
-Crawler = require('rippled-network-crawler').Crawler
-
-var crawler = Crawler(100)
-crawler.getCrawl("192.170.145.70:51235").then(function(response) {
-  console.log(response);
-})
-.catch(function(error) {
-  console.log('error', error)
-})
-```
-
-## /crawl response format
+## /crawl response format <a id="response"></a>
 
 As of the time of writing, there were various versions of rippled on the network
 and not all of them return information formatted in the same way, so some
@@ -165,49 +219,4 @@ And there are various forms for each element (connected peer) in `active`:
       "type": "peer",
       "version": "rippled-0.28.0-rc3"
     },
-```
-
-## Save to postgres
-
-### Run
-
-`node misc/crawl_db.js 192.170.145.70:51235 postgres://postgres:zxccxz@localhost:5432/crawl`
-
-### Settings (just set/unset env vars)
-
-Boolean flags, set true by presence of environment variable:
-
-* DROP_TABLES
-  * Clear the database when connecting, and sync the tables
-
-* LOG_SQL
-  * Tell sequelize to log verbosely all queries and ddl
-
-* LOG_CRAWL
-  * Log crawl
-
-## Schema
-
-### crawl
-
-|   Column   |           Type           |
-|------------|--------------------------|
-| id         | bigint                   |
-| start_at   | timestamp with time zone |
-| end_at     | timestamp with time zone |
-| entry_ipp  | string                   |
-| data       | json                     |
-| exceptions | json                     |
-| created_at | timestamp with time zone |
-| updated_at | timestamp with time zone |
-
-## Visualize
-
-``` bash
-npm install 
-npm install -g http-server
-node misc/crawl.js 192.170.145.70:51235 --r > misc/crawls/crawl.json
-node misc/graphify.js misc/crawls/crawl.json --r > misc/crawls/graph.json
-cd misc/
-http-server -o
 ```
