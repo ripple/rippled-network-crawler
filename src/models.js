@@ -2,12 +2,12 @@ var _ = require('lodash');
 var Sequelize = require('sequelize');
 var Promise = Sequelize.Promise; // bluebird++
 
-var create = module.exports = function(sql, Sequelize) {
+var create = module.exports = function(sql) {
   var Crawl = sql.define('crawl', {
     id: {
       type: Sequelize.BIGINT,
-      autoIncrement: true,
-      primaryKey: true 
+            autoIncrement: true,
+            primaryKey: true 
     },
     start_at: {
       type: Sequelize.DATE
@@ -16,7 +16,7 @@ var create = module.exports = function(sql, Sequelize) {
       type: Sequelize.DATE
     },
     entry_ipp: { 
-      type: Sequelize.ARRAY
+      type: Sequelize.TEXT
     },
     data: {
       type: Sequelize.JSON

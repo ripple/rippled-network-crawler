@@ -133,7 +133,7 @@ Crawler.prototype.getCrawl = function(entryIp) {
 }
 
 /*
-* @param {String} ipp - ip and port to crawl
+* @param {Array} ipps - ip and port to crawl
 * Initiate selective crawl at ipps and
 * return results and errors in a promise.
 * Selective means that crawl won't expand
@@ -165,7 +165,7 @@ Crawler.prototype.getSelCrawl = function(ipps) {
 */
 Crawler.prototype.enter = function(ipp) {
   this.startTime = moment().format();
-  this.entryIP = [ipp];
+  this.entryIP = ipp;
   this.crawl(ipp, 0);
 }
 
@@ -175,7 +175,7 @@ Crawler.prototype.enter = function(ipp) {
 */
 Crawler.prototype.enterSel = function(ipps) {
   this.startTime = moment().format();
-  this.entryIP = ipps;
+  this.entryIP = ipps.toString();
   this.crawlSelective(ipps);
 }
 
