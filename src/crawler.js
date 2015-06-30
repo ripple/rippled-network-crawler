@@ -54,7 +54,7 @@ function normalizePubKey(pubKeyStr) {
 }
 
 /*
-* deals with a variety of (ip, port) possibilities that occur 
+* Deals with a variety of (ip, port) possibilities that occur 
 * in rippled responses and normalizes them to the format 'ip:port'
 */
 function normalizeIpp(ip, port) {
@@ -77,6 +77,11 @@ function normalizeIpp(ip, port) {
 
 /* --------------------------------- CRAWLER -------------------------------- */
 
+/*
+* @param {Integer} max number of requests crawler will make at a time
+* @param {Logger} logger that crawler uses (should have .log .error functions)
+* Crawler constructor
+*/
 function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
   
@@ -104,12 +109,17 @@ function Crawler(maxRequests, logger) {
   this.errors = []; // {$ip_and_port/public_key : $error_object}
   this.logger = logger;
 }
-
 util.inherits(Crawler, EventEmitter);
 
+/*
+* @param {String} ipp - ip and port to crawl
+* Initiate complete crawl starting from entryIp and
+* returns results and errors in a promise.
+*/
 Crawler.prototype.getCrawl = function(entryIp) {
   var self = this;
   return new Promise(function(resolve, reject) {
+    check.assert.string(entryIp);
     if (entryIp === undefined) {
       throw new Error("Invalid ip address")
     }
@@ -118,28 +128,70 @@ Crawler.prototype.getCrawl = function(entryIp) {
     }
     self.once('done', function(response) {
       return resolve(response)
-    }).enter(entryIp)
+    }).enter(withDefaultPort(entryIp))
   })
 }
 
 /*
-* Enter at ip to start crawl
+* @param {Array} ipps - ip and port to crawl
+* Initiate selective crawl at ipps and
+* return results and errors in a promise.
+* Selective means that crawl won't expand
+* to peers of each node. The only requests that 
+* will be gathered are from ipps' /crawl endpoints.
 */
-Crawler.prototype.enter = function(ip) {
-  this.startTime = moment().format();
-  this.entryIP = withDefaultPort(ip);
-  this.crawl(withDefaultPort(ip), 0);
-};
+Crawler.prototype.getSelCrawl = function(ipps) {
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    check.assert.array(ipps);
+    _.each(ipps, function(ipp) {
+      check.assert.string(ipp);
+      if (ipp === undefined) {
+        throw new Error("Invalid ip address")
+      }
+      if (ipp.split(' ').length != 1 || !IPP_PATTERN.test(ipp)) {
+        throw new Error("Invalid ip address (perhaps port missing)")
+      }
+    });
+    self.once('done', function(response) {
+      return resolve(response)
+    }).enterSel(_.map(ipps, withDefaultPort));
+  });
+}
 
-/**
+/*
+* @param {String} ipp to start crawl on
+* Start crawl
+*/
+Crawler.prototype.enter = function(ipp) {
+  this.startTime = moment().format();
+  this.entryIP = ipp;
+  this.crawl(ipp, 0);
+}
+
+/*
+* @param {Array} ipps to crawl
+* Start selective crawl
+*/
+Crawler.prototype.enterSel = function(ipps) {
+  this.startTime = moment().format();
+  this.entryIP = ipps.toString();
+  this.crawlSelective(ipps);
+}
+
+/*
 * @param {String} ipp - ip and port to crawl
 * @param {Number} hops - from initial entryPoint
+* Collect crawl reponses from ipp
+* and expand crawl to its peers recursively
+* while keeping track of hops (distance from inital entry point)
 */
 Crawler.prototype.crawl = function(ipp, hops) {
   var self = this;
   self.queued[ipp] = REQUEST_STATUS.REQUESTING;
 
   self.crawlOne(ipp, function(error, response, body) {
+
     self.dequeue(ipp);
 
     if (error) {
@@ -147,11 +199,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
       var err = {}
       err[ipp] = error;
       self.errors.push(err);
-
-      // log error
-      //self.logger.error(ipp, 'has error:', error);
     } else {
-
       // mark ipp as done (received response)
       self.done[ipp] = 1;
 
@@ -182,6 +230,48 @@ Crawler.prototype.crawl = function(ipp, hops) {
     }
   });
 };
+
+/*
+* @param {Array} ipps - Array of ipps
+* Collect crawl reponses from ipps
+* without expanding crawl to their peers
+*/
+Crawler.prototype.crawlSelective = function(ipps) {
+  var self = this;
+  this.startTime = moment().format();
+  _.each(ipps, function(ipp) {
+    self.enqueueIfNeeded(ipp);
+    self.crawlOne(ipp, function(error, response, body) {
+      self.dequeue(ipp);
+      if (error) {
+        // save error
+        var err = {}
+        err[ipp] = error;
+        self.errors.push(err);
+        //console.error(error);
+      } else {
+        // mark ipp as done (received response)
+        self.done[ipp] = 1;
+
+        // save raw body
+        var resp = {};
+        resp[ipp] = body;
+        self.rawResponses.push(resp);
+      }
+
+      // End if all responses received
+      if (Object.keys(self.queued).length == 0) {
+        self.endTime = moment().format();
+        self.emit('done', { start:    self.startTime,
+                            end:      self.endTime,
+                            entry:    self.entryIP,
+                            data:     self.rawResponses,
+                            errors:   self.errors
+                          });
+      }
+    });
+  });
+}
 
 /*
 * Crawls over one node at ipp and retreives json 
