@@ -52,7 +52,9 @@ describe('Crawler', function() {
       var crawler = new Crawler(100)
       var entryIP = undefined
 
-      crawler.getCrawl(entryIP).catch(function(error) {})
+      crawler.getCrawl(entryIP).catch(function(error) {
+        assert.strictEqual(error.message, "Invalid string");
+      })
       .then(done, done);
     });
     it('Should throw an error when given invalid ip address', function(done) {
@@ -143,7 +145,9 @@ describe('Crawler', function() {
       var crawler = new Crawler(100)
       var ipps = ["192.170.145.70:51235", undefined]
 
-      crawler.getSelCrawl(ipps).catch(function(error) {})
+      crawler.getSelCrawl(ipps).catch(function(error) {
+        assert.strictEqual(error.message, "Invalid string");
+      })
       .then(done, done);
     });
     it('Should throw an error when given invalid ip address', function(done) {
