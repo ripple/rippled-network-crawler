@@ -197,7 +197,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
     if (error) {
       // save error
       var err = {}
-      err[ipp] = error;
+      err[ipp] = error.message;
       self.errors.push(err);
     } else {
       // mark ipp as done (received response)
@@ -246,7 +246,7 @@ Crawler.prototype.crawlSelective = function(ipps) {
       if (error) {
         // save error
         var err = {}
-        err[ipp] = error;
+        err[ipp] = error.message;
         self.errors.push(err);
         //console.error(error);
       } else {
