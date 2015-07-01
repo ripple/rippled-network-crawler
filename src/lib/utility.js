@@ -1,5 +1,5 @@
 var geoip = require('geoip-lite');
-var crawler = require('./lib/crawler.js')
+var crawler = require('./crawler.js')
 var normalizeIpp = crawler.normalizeIpp
 var normalizePubKey = crawler.normalizePubKey
 var _ = require('lodash');
