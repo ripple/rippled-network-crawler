@@ -10,75 +10,36 @@ This maps out the connections between all rippled servers (not necessarily UNLS)
 who (for the most part) don't even participate in Consensus or at least don't 
 have any say in influencing the outcome of a transaction on mainnet. 
 
-## Run crawl.js
+## Installation
 
-Example
-``` bash
-npm install 
-node src/crawl.js 192.170.145.70:51235 --readable
+```
+npm install -g rippled-network-crawler
 ```
 
 
+## Usage
+
+To list program options and commands run `--help or -h`
+
 ```
-$DATABASE_URL=postgres://postgres:zxccxz@localhost:5432/crawl
-node src/crawl.js --prior --store
+$ rippled-network-crawler --help
+
+  Usage: index [options] [command]
+
+
+  Commands:
+
+    enter <ipp>                     Crawl ipp and its peers recursively
+    selective <ipp> [otherIpps...]  Crawl specified ipps without expanding crawl to peers
+    prior <url>                     Crawl selectively on ipps from latest crawl in the database
+
+  Options:
+
+    -h, --help         output usage information
+    -V, --version      output the version number
+    -r, --readable     Output json with four space indentation
+    -m, --max <count>  Max number of http requests to have open at once, default 100
 ```
-
-### Options
-
-* #### < entry ipp >
-
-    Must be in the format `ip:port`
-    ```
-    node src/crawl.js 192.170.145.70:51235 
-    ```
-
-* #### --readable
-
-    Output json with four space indentation.
-
-* #### --selective
-
-    Crawl specified ipps without expanding crawl to peers of each rippled instance.
-
-    Ipps are read from stdin.
-
-    ```
-    node src/crawl.js --selective < ipps.txt
-    ```
-
-* #### --store
-
-    Stores crawl output into the database.
-    
-    Database specified by `$DATABASE_URL`.
-    
-    See [schema](#schema) for details.
-    
-* #### --prior
-
-    Crawls selectively based on ipps from latest crawl in the database.
-    
-    Database specified by `$DATABASE_URL`.
-
-* #### --logcrawl
-
-  Log crawl.
-
-* #### --logsql
-
-  Log all sequelize queries and ddl.
-
-* #### $DATABASE_URL
-
-  For example `postgres://postgres:zxccxz@localhost:5432/crawl`
-
-* #### $MAX_CONNECTIONS
-
-  Max number of http requests to have open at once.
-
-  Default is 100.
-
 
 ## Output structure
 
