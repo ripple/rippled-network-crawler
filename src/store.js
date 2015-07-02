@@ -2,9 +2,9 @@
 var Sequelize = require('sequelize');
 var modelsFactory = require('./lib/models.js');
 
-function saveDB(crawlJson, commander, onDone) {
-  var log = commander.logsql ? console.log : false;
-  var sql = new Sequelize(commander.dbUrl, {logging: log,
+function saveDB(crawlJson, dbUrl, logsql, onDone) {
+  var log = logsql ? console.log : false;
+  var sql = new Sequelize(dbUrl, {logging: log,
                                             dialectOptions: {ssl: true}});
   var models = modelsFactory(sql);
 

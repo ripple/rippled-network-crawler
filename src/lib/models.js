@@ -1,8 +1,7 @@
-var _ = require('lodash');
+'use strict';
 var Sequelize = require('sequelize');
-var Promise = Sequelize.Promise; // bluebird++
 
-var create = module.exports = function(sql) {
+module.exports = function(sql) {
   var Crawl = sql.define('crawl', {
     id: {
       type: Sequelize.BIGINT,

@@ -10,7 +10,7 @@ commander
           'Max number of http requests to have open at once, default 100')
   .option('-r, --readable',
           'Output json with four space indentation')
-  .option('-s, --store <url>',
+  .option('-s, --store <dbUrl>',
           'stores crawl output into the database specified (quietly)')
   .option('-q, --quiet',
           'Only output crawl json, all logging is ignored')
@@ -20,7 +20,7 @@ commander
 commander
   .command('enter <ipp>')
   .description('Crawl ipp and its peers recursively')
-  .action(function(ipp) {
+  .action(function(ipp) {clea
     src.enter(ipp, commander);
   });
 
@@ -33,10 +33,24 @@ commander
   });
 
 commander
-  .command('prior <url>')
+  .command('prior <dbUrl>')
   .description('Crawl selectively on ipps from latest crawl in the database')
-  .action(function(url) {
-    src.prior(url, commander);
+  .action(function(dbUrl) {
+    src.prior(dbUrl, commander);
+  });
+
+commander
+  .command('info <dbUrl> <id>')
+  .description('Get information about a crawl in the database by id')
+  .action(function(dbUrl, id) {
+    src.info(dbUrl, id, commander);
+  });
+
+commander
+  .command('graphify <dbUrl> <id>')
+  .description('Get a json representing a d3 graph of a crawl by id')
+  .action(function(dbUrl, id) {
+    src.graphify(dbUrl, id, commander);
   });
 
 commander

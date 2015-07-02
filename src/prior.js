@@ -1,9 +1,8 @@
 'use strict';
 var Sequelize = require('sequelize');
-var Crawler = require('./lib/crawler.js').Crawler;
 var rc_util = require('./lib/utility.js');
-var _ = require('lodash');
 var modelsFactory = require('./lib/models.js');
+var selective = require('./program').selective;
 
 function getLatestCrawl(dbUrl, logsql) {
   return new Promise(function(resolve, reject) {
@@ -17,7 +16,12 @@ function getLatestCrawl(dbUrl, logsql) {
         ['id', 'DESC']
       ]
     }).then(function(crawl) {
-      return resolve(crawl.data);
+      if (!crawl) {
+        return reject(new Error('No crawls in database'));
+      }
+      return resolve(crawl.dataValues);
+    }).catch(function(error) {
+      return reject(error);
     });
   });
 }
@@ -25,7 +29,12 @@ function getLatestCrawl(dbUrl, logsql) {
 
 module.exports = function(dbUrl, commander) {
   getLatestCrawl(dbUrl, commander.logsql).then(function(latestCrawl) {
-    var ipps = rc_util.getIpps(latestCrawl);
-    console.log(ipps);
+    var ipps = rc_util.getIpps(latestCrawl.data);
+    if (ipps) {
+      selective(ipps, commander);
+    }
+  }).catch(function(error) {
+    console.error(error.message);
+    process.exit(1);
   });
 };

@@ -9,15 +9,17 @@ module.exports = function(ipp, commander) {
   var crawler = new Crawler(maxRequests, logger);
   crawler.getCrawl(ipp)
     .then(function(response) {
-      if (commander.dbUrl) {
-        src.store(response, commander.dbUrl, commander.logsql);
+      if (commander.store) {
+        src.store(response, commander.store, commander.logsql);
       } else if (commander.readable) {
         console.log(JSON.stringify(response, null, 4));
       } else {
         console.log(JSON.stringify(response));
       }
+      process.exit(0);
     })
     .catch(function(error) {
       console.error('error:', error.message);
+      process.exit(1);
     });
 };

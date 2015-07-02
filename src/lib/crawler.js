@@ -1,3 +1,4 @@
+'use strict';
 var _ = require('lodash');
 var util = require('util');
 var request = require('request');
@@ -6,7 +7,7 @@ var EventEmitter = require('events').EventEmitter;
 var ripple = require('ripple-lib');
 var sjcl = ripple.sjcl;
 var check = require('check-types');
-var Promise = require('bluebird')
+var Promise = require('bluebird');
 
 /* --------------------------------- CONSTS --------------------------------- */
 
@@ -17,7 +18,7 @@ var REQUEST_STATUS = {
   REQUESTING: 2
 };
 
-var DEFAULT_PORT = undefined
+var DEFAULT_PORT = undefined;
 
 var IPP_PATTERN = /\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\:([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\b/;
 
@@ -34,13 +35,13 @@ function abortIfNot(expression, message) {
   }
 }
 
-function crawlUrl(domainOrIp) {
-  return 'https://' + withDefaultPort(domainOrIp) + '/crawl';
-}
-
 function withDefaultPort(domainOrIp) {
   return domainOrIp.indexOf(':') !== -1 ? domainOrIp :
                                           domainOrIp + ':' + DEFAULT_PORT;
+}
+
+function crawlUrl(domainOrIp) {
+  return 'https://' + withDefaultPort(domainOrIp) + '/crawl';
 }
 
 function normalizePubKey(pubKeyStr) {
@@ -54,7 +55,7 @@ function normalizePubKey(pubKeyStr) {
 }
 
 /*
-* Deals with a variety of (ip, port) possibilities that occur 
+* Deals with a variety of (ip, port) possibilities that occur
 * in rippled responses and normalizes them to the format 'ip:port'
 */
 function normalizeIpp(ip, port) {
@@ -63,16 +64,15 @@ function normalizeIpp(ip, port) {
         splitIp = split[0],
         splitPort = split[1];
 
-    var out_ip = splitIp
-    var out_port = port || splitPort || DEFAULT_PORT
+    var out_ip = splitIp;
+    var out_port = port || splitPort || DEFAULT_PORT;
     if (out_port) {
-      var ipp = out_ip + ':' + out_port
+      var ipp = out_ip + ':' + out_port;
       return ipp;
     }
   }
 
-  throw new Error("ip is undefined");
-  return;
+  throw new Error('ip is undefined');
 }
 
 /* --------------------------------- CRAWLER -------------------------------- */
