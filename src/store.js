@@ -28,10 +28,8 @@ module.exports = function(crawl, dbUrl, logsql) {
   saveDB(crawl, dbUrl, logsql, function(error) {
     if (error) {
       console.error('Database error:', error.message);
-      process.exit(1);
     } else {
       console.error('Saved to database');
-      process.exit(0);
     }
   });
 };

@@ -24,21 +24,26 @@ To list program options and commands run `--help or -h`
 ```
 $ rippled-network-crawler --help
 
-  Usage: index [options] [command]
+  Usage: rippled-network-crawler [options] [command]
 
 
   Commands:
 
     enter <ipp>                     Crawl ipp and its peers recursively
     selective <ipp> [otherIpps...]  Crawl specified ipps without expanding crawl to peers
-    prior <url>                     Crawl selectively on ipps from latest crawl in the database
+    prior <dbUrl>                   Crawl selectively on ipps from latest crawl in the database
+    info <dbUrl> <id>               Get information about a crawl in the database by id
+    graphify <dbUrl> <id>           Get a json representing a d3 graph of a crawl by id
 
   Options:
 
-    -h, --help         output usage information
-    -V, --version      output the version number
-    -r, --readable     Output json with four space indentation
-    -m, --max <count>  Max number of http requests to have open at once, default 100
+    -h, --help           output usage information
+    -V, --version        output the version number
+    -m, --max <count>    Max number of http requests to have open at once, default 100
+    -r, --readable       Output json with four space indentation
+    -s, --store <dbUrl>  stores crawl output into the database specified (quietly)
+    -q, --quiet          Only output crawl json, all logging is ignored
+    -l, --logsql         Log all sequelize queries and ddl
 ```
 
 ## Output structure
@@ -99,10 +104,22 @@ Response format described [here](#response).
 | created_at | timestamp with time zone |
 | updated_at | timestamp with time zone |
 
-## Info
-
 ## Visualize
 
+The `graphify` command can be used to produce a json which can be
+visualized with `misc/index.html`. Note that `index.html` looks for a file
+called `graph.json` in its same directory.
+
+Node color is indicative version.
+
+Node size is indicative of out going and incoming connection count.
+
+``` bash
+npm install http-server -g
+rippled-network-crawler graphify $DATABASE_URL 1 > misc/graph.json
+cd misc/
+http-server -o
+```
 
 ## /crawl response format <a id="response"></a>
 

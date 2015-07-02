@@ -221,7 +221,7 @@ module.exports = {
   * Takes a raw crawl and returns an
   * array of the ipps which were crawled
   */
-  getCrawled: function(nodes) {
+  getCrawledIpps: function(nodes) {
     var ipps = [];
     _.each(nodes, function(crawl) {
       ipps.push(Object.keys(crawl)[0]);

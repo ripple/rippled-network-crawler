@@ -20,7 +20,7 @@ commander
 commander
   .command('enter <ipp>')
   .description('Crawl ipp and its peers recursively')
-  .action(function(ipp) {clea
+  .action(function(ipp) {
     src.enter(ipp, commander);
   });
 

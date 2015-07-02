@@ -7,7 +7,7 @@ var EventEmitter = require('events').EventEmitter;
 var ripple = require('ripple-lib');
 var sjcl = ripple.sjcl;
 var check = require('check-types');
-var Promise = require('bluebird');
+var Promise = require('bluebird')
 
 /* --------------------------------- CONSTS --------------------------------- */
 
@@ -45,7 +45,7 @@ function crawlUrl(domainOrIp) {
 }
 
 function normalizePubKey(pubKeyStr) {
-  if (pubKeyStr.length > 50 && pubKeyStr[0] == 'n') {
+  if (pubKeyStr.length > 50 && pubKeyStr[0] === 'n') {
     return pubKeyStr;
   }
 
@@ -84,21 +84,21 @@ function normalizeIpp(ip, port) {
 */
 function Crawler(maxRequests, logger) {
   EventEmitter.call(this);
-  
+
   // maxRequests checks
   maxRequests = maxRequests ? maxRequests : 30;
-  check.assert.number(maxRequests, "Invalid max requests");
+  check.assert.number(maxRequests, 'Invalid max requests');
   if (maxRequests < 1) {
-    throw new Error("Invalid max requests");
+    throw new Error('Invalid max requests');
   }
-  
+
   // logger checks
-  logger = logger ? logger : console
+  logger = logger ? logger : console;
   if (!logger.log || !logger.error) {
-    throw new Error("Invalid logger");
+    throw new Error('Invalid logger');
   }
-  if (typeof logger.log != "function" || typeof logger.error != "function") {
-    throw new TypeError("log and error must be functions");
+  if (typeof logger.log !== 'function' || typeof logger.error !== 'function') {
+    throw new TypeError('log and error must be functions');
   }
 
   this.maxRequests = maxRequests;
@@ -121,23 +121,23 @@ Crawler.prototype.getCrawl = function(entryIp) {
   return new Promise(function(resolve, reject) {
     check.assert.string(entryIp);
     if (entryIp === undefined) {
-      throw new Error("Invalid ip address")
+      throw new Error('Invalid ip address');
     }
-    if (entryIp.split(' ').length != 1 || !IPP_PATTERN.test(entryIp)) {
-      throw new Error("Invalid ip address (perhaps port missing)")
+    if (entryIp.split(' ').length !== 1 || !IPP_PATTERN.test(entryIp)) {
+      throw new Error('Invalid ip address (perhaps port missing)');
     }
     self.once('done', function(response) {
-      return resolve(response)
-    }).enter(withDefaultPort(entryIp))
-  })
-}
+      return resolve(response);
+    }).enter(withDefaultPort(entryIp));
+  });
+};
 
 /*
 * @param {Array} ipps - ip and port to crawl
 * Initiate selective crawl at ipps and
 * return results and errors in a promise.
 * Selective means that crawl won't expand
-* to peers of each node. The only requests that 
+* to peers of each node. The only requests that
 * will be gathered are from ipps' /crawl endpoints.
 */
 Crawler.prototype.getSelCrawl = function(ipps) {
@@ -147,17 +147,17 @@ Crawler.prototype.getSelCrawl = function(ipps) {
     _.each(ipps, function(ipp) {
       check.assert.string(ipp);
       if (ipp === undefined) {
-        throw new Error("Invalid ip address")
+        throw new Error('Invalid ip address');
       }
-      if (ipp.split(' ').length != 1 || !IPP_PATTERN.test(ipp)) {
-        throw new Error("Invalid ip address (perhaps port missing)")
+      if (ipp.split(' ').length !== 1 || !IPP_PATTERN.test(ipp)) {
+        throw new Error('Invalid ip address (perhaps port missing)');
       }
     });
     self.once('done', function(response) {
-      return resolve(response)
+      return resolve(response);
     }).enterSel(_.map(ipps, withDefaultPort));
   });
-}
+};
 
 /*
 * @param {String} ipp to start crawl on
@@ -167,7 +167,7 @@ Crawler.prototype.enter = function(ipp) {
   this.startTime = moment().format();
   this.entryIP = ipp;
   this.crawl(ipp, 0);
-}
+};
 
 /*
 * @param {Array} ipps to crawl
@@ -177,7 +177,7 @@ Crawler.prototype.enterSel = function(ipps) {
   this.startTime = moment().format();
   this.entryIP = ipps.toString();
   this.crawlSelective(ipps);
-}
+};
 
 /*
 * @param {String} ipp - ip and port to crawl
@@ -196,9 +196,11 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
     if (error) {
       // save error
-      var err = {}
+      var err = {};
       err[ipp] = error;
       self.errors.push(err);
+
+      //self.logger.error(ipp, 'has error', error);
     } else {
       // mark ipp as done (received response)
       self.done[ipp] = 1;
@@ -217,16 +219,15 @@ Crawler.prototype.crawl = function(ipp, hops) {
         }
       });
     }
-    
+
     // Crawl peers
     if (!self.requestMore(hops)) {
       self.endTime = moment().format();
-      self.emit('done', { start:    self.startTime,
-                          end:      self.endTime,
-                          entry:    self.entryIP,
-                          data:     self.rawResponses,
-                          errors:   self.errors
-                        });
+      self.emit('done', {start: self.startTime,
+                         end: self.endTime,
+                         entry: self.entryIP,
+                         data: self.rawResponses,
+                         errors: self.errors});
     }
   });
 };
@@ -245,10 +246,11 @@ Crawler.prototype.crawlSelective = function(ipps) {
       self.dequeue(ipp);
       if (error) {
         // save error
-        var err = {}
+        var err = {};
         err[ipp] = error;
         self.errors.push(err);
-        //console.error(error);
+
+        //self.logger.error(ipp, 'has error', error);
       } else {
         // mark ipp as done (received response)
         self.done[ipp] = 1;
@@ -260,21 +262,20 @@ Crawler.prototype.crawlSelective = function(ipps) {
       }
 
       // End if all responses received
-      if (Object.keys(self.queued).length == 0) {
+      if (Object.keys(self.queued).length === 0) {
         self.endTime = moment().format();
-        self.emit('done', { start:    self.startTime,
-                            end:      self.endTime,
-                            entry:    self.entryIP,
-                            data:     self.rawResponses,
-                            errors:   self.errors
-                          });
+        self.emit('done', {start: self.startTime,
+                            end: self.endTime,
+                            entry: self.entryIP,
+                            data: self.rawResponses,
+                            errors: self.errors});
       }
     });
   });
-}
+};
 
 /*
-* Crawls over one node at ipp and retreives json 
+* Crawls over one node at ipp and retreives json
 */
 Crawler.prototype.crawlOne = function(ipp, cb) {
   var self;
@@ -287,20 +288,19 @@ Crawler.prototype.crawlOne = function(ipp, cb) {
   });
 };
 
-/* 
-* Actually sends the request to retreive the json 
+/*
+* Actually sends the request to retreive the json
 */
 Crawler.prototype.crawlRequest = function(ip, onResponse) {
-  var self = this;
-  var options = { url: crawlUrl(ip), 
-                  timeout: 5000, 
-                  rejectUnauthorized: false,
-                  requestCert: true,
-                  agent: false };
+  var options = {url: crawlUrl(ip),
+                 timeout: 5000,
+                 rejectUnauthorized: false,
+                 requestCert: true,
+                 agent: false};
   request(options, function(err, response, body) {
     onResponse(err, response, body ? JSON.parse(body) : null);
   });
-}
+};
 
 Crawler.prototype.requestMore = function(hops) {
   var self = this;
@@ -317,7 +317,7 @@ Crawler.prototype.requestMore = function(hops) {
   });
 
   return ipps.length !== 0;
-}
+};
 
 /*
 * Enqueue if this node hasn't already been crawled
@@ -330,7 +330,7 @@ Crawler.prototype.enqueueIfNeeded = function(ipp) {
       this.enqueue(ipp);
     }
   }
-}
+};
 
 Crawler.prototype.enqueue = function(ipp) {
   abortIfNot(this.queued[ipp] === undefined, 'queued already');

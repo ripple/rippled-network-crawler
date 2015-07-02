@@ -63,9 +63,7 @@ module.exports = function(dbUrl, id, commander) {
     } else {
       console.log(JSON.stringify(graph));
     }
-    process.exit(0);
   }).catch(function(error) {
     console.error(error.message);
-    process.exit(1);
   });
 };

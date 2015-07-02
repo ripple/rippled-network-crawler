@@ -68,9 +68,7 @@ module.exports = function(dbUrl, id, commander) {
     results.general.avgOut = getAvgOut(results.degrees);
 
     console.log(results);
-    process.exit(0);
   }).catch(function(error) {
     console.error(error.message);
-    process.exit(1);
   });
 };

@@ -16,10 +16,8 @@ module.exports = function(ipps, commander) {
       } else {
         console.log(JSON.stringify(response));
       }
-      process.exit(0);
     })
     .catch(function(error) {
       console.error('error:', error.message);
-      process.exit(1);
     });
 };
