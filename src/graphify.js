@@ -1,26 +1,6 @@
 'use strict';
-var Sequelize = require('sequelize');
 var rc_util = require('./lib/utility.js');
-var modelsFactory = require('./lib/models.js');
 var _ = require('lodash');
-
-function getCrawlById(dbUrl, id, logsql) {
-  return new Promise(function(resolve, reject) {
-    var log = logsql ? console.log : false;
-    var sql = new Sequelize(dbUrl, {logging: log, dialectOptions: {ssl: true}});
-
-    var model = modelsFactory(sql);
-
-    model.Crawl.findById(id).then(function(crawl) {
-      if (!crawl) {
-        return reject(new Error('No crawls with id ' + id));
-      }
-      return resolve(crawl.dataValues);
-    }).catch(function(error) {
-      return reject(error);
-    });
-  });
-}
 
 /*
 * Returns metrics of raw crawl
@@ -56,7 +36,7 @@ function graphify(crawl) {
 }
 
 module.exports = function(dbUrl, id, commander) {
-  getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
+  rc_util.getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
     var graph = graphify(crawl.data);
     if (commander.readable) {
       console.log(JSON.stringify(graph, null, 4));

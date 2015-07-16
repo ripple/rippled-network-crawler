@@ -4,6 +4,8 @@ var crawler = require('./crawler.js');
 var normalizeIpp = crawler.normalizeIpp;
 var normalizePubKey = crawler.normalizePubKey;
 var _ = require('lodash');
+var Sequelize = require('sequelize');
+var modelsFactory = require('./models.js');
 
 module.exports = {
 
@@ -267,6 +269,24 @@ module.exports = {
     });
 
     return out;
+  },
+
+  getCrawlById: function(dbUrl, id, logsql) {
+    return new Promise(function(resolve, reject) {
+      var log = logsql ? console.log : false;
+      var sql = new Sequelize(dbUrl, {logging: log, dialectOptions: {ssl: true}});
+
+      var model = modelsFactory(sql);
+
+      model.Crawl.findById(id).then(function(crawl) {
+        if (!crawl) {
+          return reject(new Error('No crawls with id ' + id));
+        }
+        return resolve(crawl.dataValues);
+      }).catch(function(error) {
+        return reject(error);
+      });
+    });
   }
 };
 
