@@ -10,30 +10,55 @@ This maps out the connections between all rippled servers (not necessarily UNLS)
 who (for the most part) don't even participate in Consensus or at least don't 
 have any say in influencing the outcome of a transaction on mainnet. 
 
-## Run
+## Installation
 
-``` bash
-npm install 
-node misc/crawl.js 192.170.145.70:51235 --r
+```
+npm install -g rippled-network-crawler
 ```
 
-## Response
 
-Returns a json with the crawl information
+## Usage
 
-##### JSON structure
+To list program options and commands run `--help or -h`
 
-|   Field    |    Description           |
-|------------|--------------------------|
-| start      | Crawl start time         |
-| end        | Crawl end time           |
-| entry      | Crawl entry ip:port      |
-| data       | Raw data collected       |
-| errors     | Errors                   |
+```
+$ rippled-network-crawler --help
 
-##### Example crawl
+  Usage: rippled-network-crawler [options] [command]
 
-###### top level structure
+
+  Commands:
+
+    enter <ipp>                     Crawl ipp and its peers recursively
+    selective <ipp> [otherIpps...]  Crawl specified ipps without expanding crawl to peers
+    prior <dbUrl>                   Crawl selectively on ipps from latest crawl in the database
+    info <dbUrl> <id>               Get information about a crawl in the database by id
+    graphify <dbUrl> <id>           Get a json representing a d3 graph of a crawl by id
+
+  Options:
+
+    -h, --help           output usage information
+    -V, --version        output the version number
+    -m, --max <count>    Max number of http requests to have open at once, default 100
+    -r, --readable       Output json with four space indentation
+    -s, --store <dbUrl>  stores crawl output into the database specified (quietly)
+    -q, --quiet          Only output crawl json, all logging is ignored
+    -l, --logsql         Log all sequelize queries and ddl
+```
+
+## Output structure
+
+`crawl.js` outputs a stringified json in the following format:
+
+|   Field    |    Description           | Type   |
+|------------|--------------------------|--------|
+| start      | Crawl start time         | date   |
+| end        | Crawl end time           | date   |
+| entry      | Crawl entry ip:port      | string |
+| data       | Raw data collected       | array  |
+| errors     | Errors                   | array  |
+
+### Example output
 
 ```json
     {
@@ -62,34 +87,41 @@ Returns a json with the crawl information
     }
 ```
 
-###### response
+Response format described [here](#response).
 
-```json
-    {
-      "overlay" : {
-        "active"  : [
-          ...
-        ]
-      }
-    }
+## Schema
+
+### crawl
+
+|   Column   |           Type           |
+|------------|--------------------------|
+| id         | bigint                   |
+| start_at   | timestamp with time zone |
+| end_at     | timestamp with time zone |
+| entry_ipp  | string                   |
+| data       | json                     |
+| exceptions | json                     |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+## Visualize
+
+The `graphify` command can be used to produce a json which can be
+visualized with `misc/index.html`. Note that `index.html` looks for a file
+called `graph.json` in its same directory.
+
+Node color is indicative version.
+
+Node size is indicative of out going and incoming connection count.
+
+``` bash
+npm install http-server -g
+rippled-network-crawler graphify $DATABASE_URL 1 > misc/graph.json
+cd misc/
+http-server -o
 ```
 
-
-## Example Usage
-
-``` javascript
-Crawler = require('rippled-network-crawler').Crawler
-
-var crawler = Crawler(100)
-crawler.getCrawl("192.170.145.70:51235").then(function(response) {
-  console.log(response);
-})
-.catch(function(error) {
-  console.log('error', error)
-})
-```
-
-## /crawl response format
+## /crawl response format <a id="response"></a>
 
 As of the time of writing, there were various versions of rippled on the network
 and not all of them return information formatted in the same way, so some
@@ -165,49 +197,4 @@ And there are various forms for each element (connected peer) in `active`:
       "type": "peer",
       "version": "rippled-0.28.0-rc3"
     },
-```
-
-## Save to postgres
-
-### Run
-
-`node misc/crawl_db.js 192.170.145.70:51235 postgres://postgres:zxccxz@localhost:5432/crawl`
-
-### Settings (just set/unset env vars)
-
-Boolean flags, set true by presence of environment variable:
-
-* DROP_TABLES
-  * Clear the database when connecting, and sync the tables
-
-* LOG_SQL
-  * Tell sequelize to log verbosely all queries and ddl
-
-* LOG_CRAWL
-  * Log crawl
-
-## Schema
-
-### crawl
-
-|   Column   |           Type           |
-|------------|--------------------------|
-| id         | bigint                   |
-| start_at   | timestamp with time zone |
-| end_at     | timestamp with time zone |
-| entry_ipp  | string                   |
-| data       | json                     |
-| exceptions | json                     |
-| created_at | timestamp with time zone |
-| updated_at | timestamp with time zone |
-
-## Visualize
-
-``` bash
-npm install 
-npm install -g http-server
-node misc/crawl.js 192.170.145.70:51235 --r > misc/crawls/crawl.json
-node misc/graphify.js misc/crawls/crawl.json --r > misc/crawls/graph.json
-cd misc/
-http-server -o
 ```

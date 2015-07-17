@@ -1,17 +1,18 @@
 {
   "name": "rippled-network-crawler",
-  "version": "0.1.0",
-  "description": "Crawls public Ripple network",
-  "main": "src/crawler.js",
+  "version": "0.2.3",
+  "description": "command line interface to crawl a rippled network",
+  "license": "ISC",
+  "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha test/"
   },
   "author": "Souren Papazian",
-  "license": "ISC",
   "dependencies": {
     "bluebird": "^2.9.27",
     "chai": "^3.0.0",
     "check-types": "^3.3.0",
+    "commander": "^2.8.1",
     "geoip-lite": "^1.1.6",
     "lodash": "^3.7.0",
     "mocha": "^2.2.5",
@@ -22,6 +23,9 @@
     "request": "^2.55.0",
     "ripple-lib": "^0.12.3",
     "sequelize": "^3.3.0"
+  },
+  "bin": {
+    "rippled-network-crawler": "./index.js"
   },
   "directories": {
     "test": "test"

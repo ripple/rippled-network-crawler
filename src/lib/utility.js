@@ -1,8 +1,11 @@
+'use strict';
 var geoip = require('geoip-lite');
-var crawler = require('../src/crawler.js')
-var normalizeIpp = crawler.normalizeIpp
-var normalizePubKey = crawler.normalizePubKey
+var crawler = require('./crawler.js');
+var normalizeIpp = crawler.normalizeIpp;
+var normalizePubKey = crawler.normalizePubKey;
 var _ = require('lodash');
+var Sequelize = require('sequelize');
+var modelsFactory = require('./models.js');
 
 module.exports = {
 
@@ -25,21 +28,24 @@ module.exports = {
         // peer properties
         var p_v = peer.version;
         var p_pk = normalizePubKey(peer.public_key);
+        var p_ipp;
         try {
-          var p_ipp = normalizeIpp(peer.ip, peer.port);
+          p_ipp = normalizeIpp(peer.ip, peer.port);
         } catch (error) {
-          var p_ipp = undefined;
+          p_ipp = undefined;
         }
 
         // Fill in rippled
-        var rippled = rippleds[p_pk]
+        var rippled = rippleds[p_pk];
         if (rippled) {
-          if(!rippled.ipp)
+          if (!rippled.ipp) {
             rippled.ipp = p_ipp;
-          if(!rippled.version)
+          }
+          if (!rippled.version) {
             rippled.version = p_v;
+          }
         } else {
-          rippleds[p_pk] = { ipp: p_ipp, version: p_v };
+          rippleds[p_pk] = {ipp: p_ipp, version: p_v};
         }
 
       });
@@ -49,7 +55,9 @@ module.exports = {
 
   /*
   * @param {Object} raw crawl
-  * @return {Object} { public_key: {ipp: ipp, version: version, in: count, out: count} }
+  * @return {Object} {public_key: {ipp: ipp,
+  *                                version: version,
+  *                                in: count, out: count}}
   * Takes raw crawl and returns a dictionary of unique rippleds keyed by public
   * key and with the properties ipp, version, in count and out count.
   */
@@ -61,7 +69,7 @@ module.exports = {
         rippleds[pk].in = degrees[pk].in;
         rippleds[pk].out = degrees[pk].out;
       }
-    });    
+    });
     return rippleds;
   },
 
@@ -76,9 +84,10 @@ module.exports = {
     // Create ippToPk using rippleds
     var ippToPk = {};
     _.each(Object.keys(rippleds), function(pk) {
-      var ipp = rippleds[pk].ipp
-      if (ipp)
+      var ipp = rippleds[pk].ipp;
+      if (ipp) {
         ippToPk[ipp] = pk;
+      }
     });
 
     var links = {};
@@ -93,27 +102,20 @@ module.exports = {
         // peer properties
         var p_pk = normalizePubKey(peer.public_key);
         var p_type = peer.type;
-        try {
-          var p_ipp = normalizeIpp(peer.ip, peer.port);
-        } catch (error) {
-          var p_ipp = undefined;
-        }
 
-        var a,b;
+        var a, b;
         // Make link
         if (p_type) {
           // Get link
-          if (p_type == "in") {
+          if (p_type === 'in') {
             a = ippToPk[n_ipp];
             b = p_pk;
-          }
-          else if (p_type == "out") {
+          } else if (p_type === 'out') {
             a = p_pk;
             b = ippToPk[n_ipp];
-          }
-          else if (p_type == "peer") {
+          } else if (p_type === 'peer') {
             if (peer.ip) {
-              if (peer.ip.split(":").length == 2) {
+              if (peer.ip.split(':').length === 2) {
                 a = ippToPk[n_ipp];
                 b = p_pk;
               } else {
@@ -123,14 +125,14 @@ module.exports = {
             }
           } else {
             // If type is not in/out/peer
-            throw new Error("Peer has unexpected type")
+            throw new Error('Peer has unexpected type');
           }
 
           if (a !== undefined && b !== undefined) {
-            if (links[[a,b]] === undefined) {
-              links[[a,b]] = 0;
+            if (links[[a, b]] === undefined) {
+              links[[a, b]] = 0;
             }
-            links[[a,b]] += 1;
+            links[[a, b]] += 1;
           }
         }
 
@@ -171,17 +173,17 @@ module.exports = {
 
     _.each(rippleds, function(rippled) {
       var ipp = rippled.ipp;
+      var location;
       if (ipp) {
-        geoloc = geoip.lookup(ipp.split(':')[0]);
+        var geoloc = geoip.lookup(ipp.split(':')[0]);
         location = geoloc.country + '_' + geoloc.city;
-      } else {
-        location = undefined;
       }
 
-      if (locations[location])
+      if (locations[location]) {
         locations[location] += 1;
-      else
+      } else {
         locations[location] = 1;
+      }
     });
     return locations;
   },
@@ -218,15 +220,73 @@ module.exports = {
   /*
   * @param {Object} raw crawl
   * @return {Array} ipp
-  * Takes a raw crawl and returns an 
+  * Takes a raw crawl and returns an
   * array of the ipps which were crawled
   */
-  getIpps: function(nodes) {
+  getCrawledIpps: function(nodes) {
     var ipps = [];
     _.each(nodes, function(crawl) {
       ipps.push(Object.keys(crawl)[0]);
     });
 
     return ipps;
+  },
+
+  /*
+  * @param {Object} raw crawl
+  * @return {Array} ipp
+  * Takes a raw crawl and returns an
+  * array of the all the unique ipps present
+  */
+  getIpps: function(nodes) {
+    var ipps = {};
+
+    _.each(nodes, function(node) {
+
+      // node properties
+      var n_ipp = Object.keys(node)[0];
+      var n_peers = node[n_ipp].overlay.active;
+
+      ipps[n_ipp] = 1;
+
+      _.each(n_peers, function(peer) {
+
+        // peer properties
+        var p_ipp;
+        try {
+          p_ipp = normalizeIpp(peer.ip, peer.port);
+          ipps[p_ipp] = 1;
+        } catch (error) {
+          p_ipp = undefined;
+        }
+
+      });
+    });
+
+    var out = [];
+    _.each(Object.keys(ipps), function(ipp) {
+      out.push(ipp);
+    });
+
+    return out;
+  },
+
+  getCrawlById: function(dbUrl, id, logsql) {
+    return new Promise(function(resolve, reject) {
+      var log = logsql ? console.log : false;
+      var sql = new Sequelize(dbUrl, {logging: log, dialectOptions: {ssl: true}});
+
+      var model = modelsFactory(sql);
+
+      model.Crawl.findById(id).then(function(crawl) {
+        if (!crawl) {
+          return reject(new Error('No crawls with id ' + id));
+        }
+        return resolve(crawl.dataValues);
+      }).catch(function(error) {
+        return reject(error);
+      });
+    });
   }
-}
+};
+

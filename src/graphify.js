@@ -1,34 +1,15 @@
-var fs = require('fs');
-var rc_util = require('./rawcrawl_util.js');
+'use strict';
+var rc_util = require('./lib/utility.js');
 var _ = require('lodash');
-var nconf = require('nconf');
-
-nconf.argv().env();
-var argv = nconf.get('_')
-
-if (argv.length == 1) {
-  var obj = JSON.parse(fs.readFileSync(argv[0], 'utf8'));
-  results = graphify(obj);
-  if (nconf.get('r')) {
-    console.log(JSON.stringify(results, null, 4));
-  } else {
-    console.log(JSON.stringify(results));
-  }
-} else {
-  console.error('eg: node misc/graphify.js misc/crawls/crawl.json');
-  process.exit(1);
-}
 
 /*
 * Returns metrics of raw crawl
 */
-function graphify(rawCrawl) {
-  var results = { nodes: [], 
-                  links: [] }
-
+function graphify(crawl) {
+  var results = {nodes: [], links: []};
   var pkToIndex = {};
-  var rippleds = rc_util.getRippledsC(rawCrawl.data);
-  var links = rc_util.getLinks(rawCrawl.data);
+  var rippleds = rc_util.getRippledsC(crawl);
+  var links = rc_util.getLinks(crawl);
 
   // Fill in nodes and save indices
   _.each(Object.keys(rippleds), function(pk) {
@@ -53,3 +34,16 @@ function graphify(rawCrawl) {
 
   return results;
 }
+
+module.exports = function(dbUrl, id, commander) {
+  rc_util.getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
+    var graph = graphify(crawl.data);
+    if (commander.readable) {
+      console.log(JSON.stringify(graph, null, 4));
+    } else {
+      console.log(JSON.stringify(graph));
+    }
+  }).catch(function(error) {
+    console.error(error.message);
+  });
+};

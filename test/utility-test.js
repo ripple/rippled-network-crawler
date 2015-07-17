@@ -1,8 +1,6 @@
-var promise = require('chai').expect
-var assert = require('chai').assert
-var expect = require('chai').expect
-var _ = require('lodash');
-var rc_util = require('../misc/rawcrawl_util.js');
+'use strict';
+var expect = require('chai').expect;
+var rc_util = require('../src/lib/utility.js');
 
 var invalid_crawl = require('./data/invalid_crawl.json');
 var valid_crawl = require('./data/valid_crawl.json');
@@ -78,6 +76,15 @@ describe('Rawcrawl Util', function() {
     it("Should return an object", function() {
       var obj = rc_util.getDegrees(valid_crawl.data);
       expect(obj).to.be.an('object');
+    });
+  });
+  describe('#getCrawledIpps()', function() {
+    it("Shouldn't throw an error when given valid crawl data", function() {
+      rc_util.getCrawledIpps(valid_crawl.data);
+    });
+    it("Should return an array", function() {
+      var obj = rc_util.getCrawledIpps(valid_crawl.data);
+      expect(obj).to.be.an('array');
     });
   });
   describe('#getIpps()', function() {
