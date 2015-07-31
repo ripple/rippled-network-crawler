@@ -6,6 +6,7 @@ var normalizePubKey = crawler.normalizePubKey;
 var _ = require('lodash');
 var DB = require('./database');
 var modelsFactory = require('./models.js');
+var Promise = require('bluebird');
 
 module.exports = {
 
