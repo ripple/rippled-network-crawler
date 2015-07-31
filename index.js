@@ -54,6 +54,13 @@ commander
   });
 
 commander
+  .command('forever <ipp> <dbUrl>')
+  .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
+  .action(function(ipp, dbUrl) {
+    src.forever(ipp, dbUrl, commander);
+  });
+
+commander
   .parse(process.argv);
 
 if (!process.argv.slice(2).length) {

@@ -189,7 +189,6 @@ Crawler.prototype.enterSel = function(ipps) {
 Crawler.prototype.crawl = function(ipp, hops) {
   var self = this;
   self.queued[ipp] = REQUEST_STATUS.REQUESTING;
-
   self.crawlOne(ipp, function(error, response, body) {
 
     self.dequeue(ipp);
@@ -297,8 +296,12 @@ Crawler.prototype.crawlRequest = function(ip, onResponse) {
                  rejectUnauthorized: false,
                  requestCert: true,
                  agent: false};
+  var start_moment = moment().format();
   request(options, function(err, response, body) {
-    onResponse(err, response, body ? JSON.parse(body) : null);
+    var json = body ? JSON.parse(body) : {};
+    json.request_end_at = moment().format();
+    json.request_start_at = start_moment;
+    onResponse(err, response, json);
   });
 };
 

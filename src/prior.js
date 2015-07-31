@@ -1,13 +1,14 @@
 'use strict';
-var Sequelize = require('sequelize');
+var DB = require('./lib/database');
 var rc_util = require('./lib/utility.js');
 var modelsFactory = require('./lib/models.js');
 var selective = require('./program').selective;
+var Promise = require('bluebird');
 
 function getLatestCrawl(dbUrl, logsql) {
   return new Promise(function(resolve, reject) {
     var log = logsql ? console.log : false;
-    var sql = new Sequelize(dbUrl, {logging: log, dialectOptions: {ssl: true}});
+    var sql = DB.initSql(dbUrl, log);
 
     var model = modelsFactory(sql);
 
@@ -28,12 +29,17 @@ function getLatestCrawl(dbUrl, logsql) {
 
 
 module.exports = function(dbUrl, commander) {
-  getLatestCrawl(dbUrl, commander.logsql).then(function(latestCrawl) {
-    var ipps = rc_util.getIpps(latestCrawl.data);
-    if (ipps) {
-      selective(ipps, commander);
-    }
-  }).catch(function(error) {
-    console.error(error.message);
+  return new Promise(function(resolve, reject){
+    getLatestCrawl(dbUrl, commander.logsql).then(function(latestCrawl) {
+      var ipps = rc_util.getIpps(latestCrawl.data);
+      if (ipps) {
+        selective(ipps, commander)
+        .then(resolve)
+        .catch(reject);
+      }    
+    }).catch(function(error) {
+      console.error(error.message);
+      reject(error);
+    });
   });
 };

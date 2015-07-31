@@ -4,7 +4,7 @@ var crawler = require('./crawler.js');
 var normalizeIpp = crawler.normalizeIpp;
 var normalizePubKey = crawler.normalizePubKey;
 var _ = require('lodash');
-var Sequelize = require('sequelize');
+var DB = require('./database');
 var modelsFactory = require('./models.js');
 
 module.exports = {
@@ -274,7 +274,7 @@ module.exports = {
   getCrawlById: function(dbUrl, id, logsql) {
     return new Promise(function(resolve, reject) {
       var log = logsql ? console.log : false;
-      var sql = new Sequelize(dbUrl, {logging: log, dialectOptions: {ssl: true}});
+      var sql = DB.initSql(dbUrl, log);
 
       var model = modelsFactory(sql);
 
