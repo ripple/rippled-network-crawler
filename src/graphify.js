@@ -5,10 +5,10 @@ var _ = require('lodash');
 /*
 * Returns metrics of raw crawl
 */
-function graphify(crawl) {
+function ippCount(crawl) {
   var results = {nodes: [], links: []};
   var pkToIndex = {};
-  var rippleds = rc_util.getRippledsC(crawl);
+  var rippleds = rc_util.getIpps(crawl);
   var links = rc_util.getLinks(crawl);
 
   // Fill in nodes and save indices

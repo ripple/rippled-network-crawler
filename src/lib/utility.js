@@ -7,6 +7,7 @@ var _ = require('lodash');
 var DB = require('./database');
 var modelsFactory = require('./models.js');
 var Promise = require('bluebird');
+var moment = require('moment');
 
 module.exports = {
 
@@ -288,6 +289,49 @@ module.exports = {
         return reject(error);
       });
     });
+  },
+
+  /**
+   * @param  {string} dbUrl    database url
+   * @param  {string} startAt  date in the ISO8601 format YYYY-MM-DDTHH:mm:ssZ.
+   * @param  {[type]} endAt    date in the ISO8601 format YYYY-MM-DDTHH:mm:ssZ.
+   * @param  {[type]} interval interval in seconds
+   * @param  {[type]} logsql   sql logging
+   * @return {[type]}          array of crawls between dates startAt and endAt. 
+   *                           Each successive record is (interval +- offset)
+   *                           apart from the previosu one
+   */
+  getCrawlsFiltered: function(dbUrl, startAt, endAt, interval, logsql){
+    return new Promise(function(resolve, reject){
+      var offset = 10; // 10 seconds offset is allowed from fixed time intervals
+      var log = logsql ? console.log : false;
+      var sql = DB.initSql(dbUrl, log);
+      var model = modelsFactory(sql);
+      model.Crawl.findAll({
+        where : ["start_at > ? and end_at < ? and " +
+                 "cast(extract(epoch from start_at) as bigint) % ? < ?",
+                 startAt, endAt, interval, offset],
+        order : [
+          ['start_at', 'ASC']
+        ]
+      })
+      .then(function(result){
+        var ret = [];
+        var i;
+        var lastTime = -1;
+        for(i = 0; i < result.length; ++i){
+          var r = result[i].dataValues;
+          var t = moment(r.start_at).unix();
+          if(lastTime == -1 || (t - lastTime >= offset) || (offset >= interval)){
+            ret.push(r);
+            lastTime = t;
+          }
+        }
+        resolve(ret);
+      })
+      .catch(reject);
+    });
   }
+
 };
 
