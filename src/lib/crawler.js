@@ -164,7 +164,7 @@ Crawler.prototype.getSelCrawl = function(ipps) {
 * Start crawl
 */
 Crawler.prototype.enter = function(ipp) {
-  this.startTime = moment().format();
+  this.startTime = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
   this.entryIP = ipp;
   this.crawl(ipp, 0);
 };
@@ -174,7 +174,7 @@ Crawler.prototype.enter = function(ipp) {
 * Start selective crawl
 */
 Crawler.prototype.enterSel = function(ipps) {
-  this.startTime = moment().format();
+  this.startTime = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
   this.entryIP = ipps.toString();
   this.crawlSelective(ipps);
 };
@@ -221,7 +221,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
     // Crawl peers
     if (!self.requestMore(hops)) {
-      self.endTime = moment().format();
+      self.endTime = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
       self.emit('done', {start: self.startTime,
                          end: self.endTime,
                          entry: self.entryIP,
@@ -238,7 +238,7 @@ Crawler.prototype.crawl = function(ipp, hops) {
 */
 Crawler.prototype.crawlSelective = function(ipps) {
   var self = this;
-  this.startTime = moment().format();
+  this.startTime = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
   _.each(ipps, function(ipp) {
     self.enqueueIfNeeded(ipp);
     self.crawlOne(ipp, function(error, response, body) {
@@ -262,7 +262,7 @@ Crawler.prototype.crawlSelective = function(ipps) {
 
       // End if all responses received
       if (Object.keys(self.queued).length === 0) {
-        self.endTime = moment().format();
+        self.endTime = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
         self.emit('done', {start: self.startTime,
                             end: self.endTime,
                             entry: self.entryIP,
@@ -296,10 +296,10 @@ Crawler.prototype.crawlRequest = function(ip, onResponse) {
                  rejectUnauthorized: false,
                  requestCert: true,
                  agent: false};
-  var start_moment = moment().format();
+  var start_moment = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
   request(options, function(err, response, body) {
     var json = body ? JSON.parse(body) : {};
-    json.request_end_at = moment().format();
+    json.request_end_at = moment().format("YYYY-MM-DDTHH:mm:ss.msZ");
     json.request_start_at = start_moment;
     onResponse(err, response, json);
   });
