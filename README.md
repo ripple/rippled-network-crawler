@@ -34,6 +34,7 @@ $ rippled-network-crawler --help
     prior <dbUrl>                   Crawl selectively on ipps from latest crawl in the database
     info <dbUrl> <id>               Get information about a crawl in the database by id
     graphify <dbUrl> <id>           Get a json representing a d3 graph of a crawl by id
+    forever <ipp> <dbUrl>           run crawl forever starting from ipp (-s flag will be turned on automatically)
 
   Options:
 
@@ -67,10 +68,20 @@ $ rippled-network-crawler --help
         "entry" : "162.217.98.90:51235",
         "data" : [
             {   
-                "162.217.98.90:51235" :  response
+                "162.217.98.90:51235" :
+                    {
+                        response,
+                        "request_end_at": "2015-08-04T02:44:37.400+00:00",
+                        "request_start_at": "2015-08-04T02:44:37.300+00:00"
+                    }
             },
             {
-                "72.251.233.165:51235" : response
+                "72.251.233.165:51235" :
+                    {
+                        response,
+                        "request_end_at": "2015-08-04T02:44:37.500+00:00",
+                        "request_start_at": "2015-08-04T02:44:37.400+00:00"
+                    }
             },
             {
                 ...
