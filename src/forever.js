@@ -1,28 +1,30 @@
 'use strict';
 var src = require('./program');
 
+function callPrior(dbUrl, commander, lastCrawl) {
+  console.log('FOREVER: calling PRIOR.....');
+  src
+  .prior(dbUrl, commander, lastCrawl)
+  .then(function(crawl) {
+    callPrior(dbUrl, commander, crawl);
+  })
+  .catch(function(error) {
+    console.log('FOREVER: error: PRIOR did not finish successfully');
+    console.log(error);
+  });
+}
+
 module.exports = function(ipp, dbUrl, commander) {
-  console.log("FOREVER: calling ENTER.....")
+  console.log('FOREVER: calling ENTER.....');
+
   commander.store = dbUrl;  // turning on -s dbUrl flag.
   src
   .enter(ipp, commander)
-  .then(function(){
-    callPrior(dbUrl, commander);
+  .then(function(crawl) {
+    callPrior(dbUrl, commander, crawl);
   })
-  .catch(function(error){
-    console.log("FOREVER: error: ENTER did not finish successfully");
-  });  
-};
-
-function callPrior(dbUrl, commander){
-  console.log("FOREVER: calling PRIOR.....")
-  src
-  .prior(dbUrl, commander)
-  .then(function(){
-    callPrior(dbUrl, commander);
-  })
-  .catch(function(error){
-    console.log("FOREVER: error: PRIOR did not finish successfully");
+  .catch(function(error) {
+    console.log('FOREVER: error: ENTER did not finish successfully');
     console.log(error);
-  })
-}
+  });
+};
