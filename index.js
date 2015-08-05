@@ -15,7 +15,10 @@ commander
   .option('-q, --quiet',
           'Only output crawl json, all logging is ignored')
   .option('-l, --logsql',
-          'Log all sequelize queries and ddl');
+          'Log all sequelize queries and ddl')
+  .option('-g, --graphite',
+          'Feed data to graphite for each crawl. Used only with <forever>');
+
 
 commander
   .command('enter <ipp>')

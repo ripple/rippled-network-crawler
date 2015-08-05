@@ -7,7 +7,7 @@ var EventEmitter = require('events').EventEmitter;
 var ripple = require('ripple-lib');
 var sjcl = ripple.sjcl;
 var check = require('check-types');
-var Promise = require('bluebird')
+var Promise = require('bluebird');
 
 /* --------------------------------- CONSTS --------------------------------- */
 

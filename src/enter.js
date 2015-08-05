@@ -5,7 +5,7 @@ var src = require('./program');
 var Promise = require('bluebird');
 
 module.exports = function(ipp, commander) {
-  return new Promise(function(resolve, reject){
+  return new Promise(function(resolve, reject) {
     var logger = commander.quiet ? {log: _.noop, error: _.noop} : console;
     var maxRequests = commander.max ? parseInt(commander.max, 10) : 100;
     var crawler = new Crawler(maxRequests, logger);
@@ -20,11 +20,11 @@ module.exports = function(ipp, commander) {
           console.log(JSON.stringify(response, null, 4));
         } else {
           console.log(JSON.stringify(response));
-        }      
+        }
       })
       .catch(function(error) {
         console.error('error:', error.message);
         reject(error);
       });
-  })
+  });
 };
