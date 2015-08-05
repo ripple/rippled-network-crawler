@@ -28,18 +28,26 @@ function getLatestCrawl(dbUrl, logsql) {
 }
 
 
-module.exports = function(dbUrl, commander) {
+module.exports = function(dbUrl, commander, lastCrawl) {
   return new Promise(function(resolve, reject){
-    getLatestCrawl(dbUrl, commander.logsql).then(function(latestCrawl) {
+    if(lastCrawl){
+      useLatestCrawl(lastCrawl)
+    } else {
+      getLatestCrawl(dbUrl, commander.logsql)
+      .then(useLatestCrawl)
+      .catch(function(error) {
+        console.error(error.message);
+        reject(error);
+      });
+    }
+    
+    function useLatestCrawl(latestCrawl) {
       var ipps = rc_util.getIpps(latestCrawl.data);
       if (ipps) {
         selective(ipps, commander)
         .then(resolve)
         .catch(reject);
       }    
-    }).catch(function(error) {
-      console.error(error.message);
-      reject(error);
-    });
+    }
   });
 };

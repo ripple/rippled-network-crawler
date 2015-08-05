@@ -32,7 +32,7 @@ module.exports = function(crawl, dbUrl, logsql, cb) {
         reject(error);
       } else {
         console.log('Saved to database');
-        resolve();
+        resolve(crawl);
       }
     });
   });
