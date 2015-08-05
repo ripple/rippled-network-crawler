@@ -192,7 +192,7 @@ module.exports = {
   /*
   * @param {Object} raw crawl
   * @return {Object} {public_key: {in: count, out: count}}
-  * Takes a raw crawl and returns the 
+  * Takes a raw crawl and returns the
   * in and out degree of each rippled instance.
   */
   getDegrees: function(nodes) {

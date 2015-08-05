@@ -5,7 +5,7 @@ var src = require('./program');
 var Promise = require('bluebird');
 
 module.exports = function(ipps, commander) {
-  return new Promise(function(resolve, reject){
+  return new Promise(function(resolve, reject) {
     var logger = commander.quiet ? {log: _.noop, error: _.noop} : console;
     var maxRequests = commander.max ? parseInt(commander.max, 10) : 100;
     var crawler = new Crawler(maxRequests, logger);

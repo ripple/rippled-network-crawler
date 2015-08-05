@@ -24,15 +24,15 @@ function saveDB(crawlJson, dbUrl, logsql, onDone) {
   });
 }
 
-module.exports = function(crawl, dbUrl, logsql, cb) {
-  return new Promise(function(resolve, reject){
+module.exports = function(crawl, dbUrl, logsql) {
+  return new Promise(function(resolve, reject) {
     saveDB(crawl, dbUrl, logsql, function(error) {
       if (error) {
         console.error('Database error:', error.message);
         reject(error);
       } else {
         console.log('Saved to database');
-        resolve();
+        resolve(crawl);
       }
     });
   });

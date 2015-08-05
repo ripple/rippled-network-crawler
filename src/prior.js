@@ -27,19 +27,26 @@ function getLatestCrawl(dbUrl, logsql) {
   });
 }
 
-
-module.exports = function(dbUrl, commander) {
-  return new Promise(function(resolve, reject){
-    getLatestCrawl(dbUrl, commander.logsql).then(function(latestCrawl) {
+module.exports = function(dbUrl, commander, lastCrawl) {
+  return new Promise(function(resolve, reject) {
+    function useLatestCrawl(latestCrawl) {
       var ipps = rc_util.getIpps(latestCrawl.data);
       if (ipps) {
         selective(ipps, commander)
         .then(resolve)
         .catch(reject);
-      }    
-    }).catch(function(error) {
-      console.error(error.message);
-      reject(error);
-    });
+      }
+    }
+
+    if (lastCrawl) {
+      useLatestCrawl(lastCrawl);
+    } else {
+      getLatestCrawl(dbUrl, commander.logsql)
+      .then(useLatestCrawl)
+      .catch(function(error) {
+        console.error(error.message);
+        reject(error);
+      });
+    }
   });
 };
