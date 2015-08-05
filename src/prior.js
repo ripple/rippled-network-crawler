@@ -27,11 +27,19 @@ function getLatestCrawl(dbUrl, logsql) {
   });
 }
 
-
 module.exports = function(dbUrl, commander, lastCrawl) {
-  return new Promise(function(resolve, reject){
-    if(lastCrawl){
-      useLatestCrawl(lastCrawl)
+  return new Promise(function(resolve, reject) {
+    function useLatestCrawl(latestCrawl) {
+      var ipps = rc_util.getIpps(latestCrawl.data);
+      if (ipps) {
+        selective(ipps, commander)
+        .then(resolve)
+        .catch(reject);
+      }
+    }
+
+    if (lastCrawl) {
+      useLatestCrawl(lastCrawl);
     } else {
       getLatestCrawl(dbUrl, commander.logsql)
       .then(useLatestCrawl)
@@ -39,15 +47,6 @@ module.exports = function(dbUrl, commander, lastCrawl) {
         console.error(error.message);
         reject(error);
       });
-    }
-    
-    function useLatestCrawl(latestCrawl) {
-      var ipps = rc_util.getIpps(latestCrawl.data);
-      if (ipps) {
-        selective(ipps, commander)
-        .then(resolve)
-        .catch(reject);
-      }    
     }
   });
 };

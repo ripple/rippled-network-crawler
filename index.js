@@ -17,7 +17,7 @@ commander
   .option('-l, --logsql',
           'Log all sequelize queries and ddl')
   .option('-g, --graphite',
-          'feed data to graphite for live visualization. Used only with command <forever>');
+          'Feed data to graphite for each crawl. Used only with <forever>');
 
 
 commander
