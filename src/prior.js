@@ -5,6 +5,28 @@ var modelsFactory = require('./lib/models.js');
 var selective = require('./program').selective;
 var Promise = require('bluebird');
 
+function getLatestCrawl(dbUrl, logsql) {
+  return new Promise(function(resolve, reject) {
+    var log = logsql ? console.log : false;
+    var sql = DB.initSql(dbUrl, log);
+
+    var model = modelsFactory(sql);
+
+    model.Crawl.findOne({
+      order: [
+        ['id', 'DESC']
+      ]
+    }).then(function(crawl) {
+      if (!crawl) {
+        return reject(new Error('No crawls in database'));
+      }
+      return resolve(crawl.dataValues);
+    }).catch(function(error) {
+      return reject(error);
+    });
+  });
+}
+
 module.exports = function(dbUrl, commander, lastCrawl) {
   return new Promise(function(resolve, reject) {
     function useLatestCrawl(latestCrawl) {
@@ -19,7 +41,7 @@ module.exports = function(dbUrl, commander, lastCrawl) {
     if (lastCrawl) {
       useLatestCrawl(lastCrawl);
     } else {
-      rc_util.getLatestCrawl(dbUrl, commander.logsql)
+      getLatestCrawl(dbUrl, commander.logsql)
       .then(useLatestCrawl)
       .catch(function(error) {
         console.error(error.message);
