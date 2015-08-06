@@ -290,6 +290,29 @@ module.exports = {
     });
   },
 
+  getCrawlsByIds: function(dbUrl, startId, endId, logsql) {
+    return new Promise(function(resolve, reject) {
+      if (endId < startId || startId < 0 || endId < 0)
+        return reject('Invalid id range');
+        
+      var log = logsql ? console.log : false;
+      var sql = DB.initSql(dbUrl, log);
+
+      var model = modelsFactory(sql);
+
+      model.Crawl.findAll({
+        where: ["id >= ? and id <= ?", startId, endId]
+      }).then(function(crawls) {
+        if (!crawls) {
+          return reject(new Error('Missing crawls of id', startId, '-', endId));
+        }
+        return resolve(crawls);
+      }).catch(function(error) {
+        return reject(error);
+      });
+    });
+  },
+
   getLatestCrawl: function(dbUrl, logsql) {
     return new Promise(function(resolve, reject) {
       var log = logsql ? console.log : false;
