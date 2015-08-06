@@ -288,27 +288,6 @@ module.exports = {
         return reject(error);
       });
     });
-  },
-
-  getLatestCrawl: function(dbUrl, logsql) {
-    return new Promise(function(resolve, reject) {
-      var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
-
-      var model = modelsFactory(sql);
-
-      model.Crawl.findOne({
-        order: [
-          ['id', 'DESC']
-        ]
-      }).then(function(crawl) {
-        if (!crawl) {
-          return reject(new Error('No crawls in database'));
-        }
-        return resolve(crawl.dataValues);
-      }).catch(function(error) {
-        return reject(error);
-      });
-    });
   }
 };
+
