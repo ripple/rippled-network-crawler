@@ -28,3 +28,6 @@ node_modules
 
 # Mac files
 .DS_Store
+
+# graph json data
+misc/graph.json

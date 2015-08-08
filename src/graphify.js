@@ -1,6 +1,7 @@
 'use strict';
 var rc_util = require('./lib/utility.js');
 var _ = require('lodash');
+var Promise = require('bluebird');
 
 /*
 * Returns metrics of raw crawl
@@ -36,14 +37,14 @@ function graphify(crawl) {
 }
 
 module.exports = function(dbUrl, id, commander) {
-  rc_util.getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
-    var graph = graphify(crawl.data);
-    if (commander.readable) {
-      console.log(JSON.stringify(graph, null, 4));
-    } else {
-      console.log(JSON.stringify(graph));
-    }
-  }).catch(function(error) {
-    console.error(error.message);
+  return new Promise(function(resolve, reject) {
+    rc_util.getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
+      var graph = graphify(crawl.data);
+      if (commander.readable) {
+        console.log(JSON.stringify(graph, null, 4));
+      } else {
+        console.log(JSON.stringify(graph));
+      }
+    }).catch(reject);
   });
 };
