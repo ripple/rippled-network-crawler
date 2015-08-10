@@ -18,10 +18,10 @@ module.exports = function(sql) {
       type: Sequelize.TEXT
     },
     data: {
-      type: Sequelize.JSON
+      type: Sequelize.TEXT
     },
     exceptions: {
-      type: Sequelize.JSON
+      type: Sequelize.TEXT
     }
   }, {
     timestamps: true,

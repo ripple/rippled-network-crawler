@@ -1,14 +1,14 @@
 # Rippled Network Crawler
 
 This crawls the ripple network,
-via making requests to the /crawl endpoint of each peer it can connect to, 
+via making requests to the /crawl endpoint of each peer it can connect to,
 starting from an entry point. Some peers may know, and publish (perhaps errantly
 .. ), the ip associated with a peer, while others don't. We merge the points of
 view of each peer, collecting a dict of data, keyed by ip address.
 
 This maps out the connections between all rippled servers (not necessarily UNLS)
-who (for the most part) don't even participate in Consensus or at least don't 
-have any say in influencing the outcome of a transaction on mainnet. 
+who (for the most part) don't even participate in Consensus or at least don't
+have any say in influencing the outcome of a transaction on mainnet.
 
 ## Installation
 
@@ -67,7 +67,7 @@ $ rippled-network-crawler --help
         "end" : "2015-06-18T16:48:48-07:00",
         "entry" : "162.217.98.90:51235",
         "data" : [
-            {   
+            {
                 "162.217.98.90:51235" :
                     {
                         response,
@@ -91,7 +91,7 @@ $ rippled-network-crawler --help
             { "98.167.119.231:51235" : { "code": "ECONNRESET" } },
             { "52.4.169.56:51235" :  { "code": "ECONNREFUSED",
                                        "errno": "ECONNREFUSED",
-                                       "syscall": "connect" } 
+                                       "syscall": "connect" }
             },
             ...
         ]
@@ -110,8 +110,8 @@ Response format described [here](#response).
 | start_at   | timestamp with time zone |
 | end_at     | timestamp with time zone |
 | entry_ipp  | string                   |
-| data       | json                     |
-| exceptions | json                     |
+| data       | text                     |
+| exceptions | text                     |
 | created_at | timestamp with time zone |
 | updated_at | timestamp with time zone |
 

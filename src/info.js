@@ -21,8 +21,9 @@ function getAvgOut(degrees) {
 
 module.exports = function(dbUrl, id, commander) {
   id = parseInt(id, 10);
-  rc_util.getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
-    var results = {entry: crawl.entry_ipp,
+  rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+    var body = JSON.parse(row.data);
+    var results = {entry: row.entry_ipp,
                    general: {},
                    rippleds: {},
                    links: {},
@@ -30,15 +31,15 @@ module.exports = function(dbUrl, id, commander) {
                    versions: {},
                    locations: {}};
 
-    results.rippleds = rc_util.getRippledsC(crawl.data);
+    results.rippleds = rc_util.getRippledsC(body);
 
-    results.versions = rc_util.getVersions(crawl.data);
+    results.versions = rc_util.getVersions(body);
 
-    results.locations = rc_util.getLocations(crawl.data);
+    results.locations = rc_util.getLocations(body);
 
-    results.links = rc_util.getLinks(crawl.data);
+    results.links = rc_util.getLinks(body);
 
-    results.degrees = rc_util.getDegrees(crawl.data);
+    results.degrees = rc_util.getDegrees(body);
 
     results.general.nodes = Object.keys(results.rippleds).length;
     results.general.links = Object.keys(results.links).length;
