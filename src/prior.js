@@ -15,12 +15,14 @@ module.exports = function(dbUrl, commander, lastCrawl) {
         .catch(reject);
       }
     }
-
+    
     if (lastCrawl) {
       useLatestCrawl(lastCrawl);
     } else {
-      rc_util.getLatestCrawl(dbUrl, commander.logsql)
-      .then(useLatestCrawl)
+      rc_util.getLatestRow(dbUrl, commander.logsql)
+      .then(function(row) {
+        useLatestCrawl(row.data)
+      })
       .catch(function(error) {
         console.error(error.message);
         reject(error);

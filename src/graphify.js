@@ -36,8 +36,8 @@ function graphify(crawl) {
 }
 
 module.exports = function(dbUrl, id, commander) {
-  rc_util.getCrawlById(dbUrl, id, commander.logsql).then(function(crawl) {
-    var graph = graphify(crawl.data);
+  rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+    var graph = graphify(JSON.parse(row.data));
     if (commander.readable) {
       console.log(JSON.stringify(graph, null, 4));
     } else {
