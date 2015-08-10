@@ -3,6 +3,7 @@
 
 var commander = require('commander');
 var src = require('./src/program');
+var moment = require('moment');
 
 commander
   .version(require('./package.json').version)
@@ -21,7 +22,11 @@ commander
   .command('enter <ipp>')
   .description('Crawl ipp and its peers recursively')
   .action(function(ipp) {
-    src.enter(ipp, commander);
+    src
+    .enter(ipp, commander)
+    .catch(function(err) {
+      console.error(err);
+    });
   });
 
 commander
@@ -29,35 +34,56 @@ commander
   .description('Crawl specified ipps without expanding crawl to peers')
   .action(function(ipp, otherIpps) {
     var ipps = otherIpps ? [ipp].concat(otherIpps) : [ipp];
-    src.selective(ipps, commander);
+    src
+    .selective(ipps, commander)
+    .catch(function(err) {
+      console.error(err);
+    });
   });
 
 commander
   .command('prior <dbUrl>')
   .description('Crawl selectively on ipps from latest crawl in the database')
   .action(function(dbUrl) {
-    src.prior(dbUrl, commander);
+    src
+    .prior(dbUrl, commander)
+    .catch(function(err) {
+      console.error(err);
+    });
   });
 
 commander
   .command('info <dbUrl> <id>')
   .description('Get information about a crawl in the database by id')
   .action(function(dbUrl, id) {
-    src.info(dbUrl, id, commander);
+    src
+    .info(dbUrl, id, commander)
+    .catch(function(err) {
+      console.error(err);
+    });
   });
 
 commander
   .command('graphify <dbUrl> <id>')
   .description('Get a json representing a d3 graph of a crawl by id')
   .action(function(dbUrl, id) {
-    src.graphify(dbUrl, id, commander);
+    src
+    .graphify(dbUrl, id, commander)
+    .catch(function(err) {
+      console.error(err);
+    });
   });
 
 commander
   .command('forever <ipp> <dbUrl>')
   .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
   .action(function(ipp, dbUrl) {
-    src.forever(ipp, dbUrl, commander);
+    console.log("FOREVER called at:" + moment().format());
+    src
+    .forever(ipp, dbUrl, commander)
+    .catch(function(err) {
+      console.error(err);
+    });
   });
 
 commander

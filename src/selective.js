@@ -23,9 +23,6 @@ module.exports = function(ipps, commander) {
         console.log(JSON.stringify(response));
       }
     })
-    .catch(function(error) {
-      console.error('error:', error.message);
-      reject(error);
-    });
+    .catch(reject);
   });
 };

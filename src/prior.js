@@ -21,10 +21,7 @@ module.exports = function(dbUrl, commander, lastCrawl) {
     } else {
       rc_util.getLatestCrawl(dbUrl, commander.logsql)
       .then(useLatestCrawl)
-      .catch(function(error) {
-        console.error(error.message);
-        reject(error);
-      });
+      .catch(reject);
     }
   });
 };

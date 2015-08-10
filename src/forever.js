@@ -1,30 +1,26 @@
 'use strict';
 var src = require('./program');
+var Promise = require('bluebird');
 
 function callPrior(dbUrl, commander, lastCrawl) {
-  console.log('FOREVER: calling PRIOR.....');
   src
   .prior(dbUrl, commander, lastCrawl)
   .then(function(crawl) {
     callPrior(dbUrl, commander, crawl);
   })
-  .catch(function(error) {
-    console.log('FOREVER: error: PRIOR did not finish successfully');
-    console.log(error);
+  .catch(function(err) {
+    console.log(err);
   });
 }
 
 module.exports = function(ipp, dbUrl, commander) {
-  console.log('FOREVER: calling ENTER.....');
-
-  commander.store = dbUrl;  // turning on -s dbUrl flag.
-  src
-  .enter(ipp, commander)
-  .then(function(crawl) {
-    callPrior(dbUrl, commander, crawl);
-  })
-  .catch(function(error) {
-    console.log('FOREVER: error: ENTER did not finish successfully');
-    console.log(error);
+  return new Promise(function(resolve, reject) {
+    commander.store = dbUrl;  // turning on -s dbUrl flag.
+    src
+    .enter(ipp, commander)
+    .then(function(crawl) {
+      callPrior(dbUrl, commander, crawl);
+    })
+    .catch(reject);
   });
 };
