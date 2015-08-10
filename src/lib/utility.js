@@ -283,16 +283,20 @@ module.exports = {
   */
   getRowById: function(dbUrl, id, logsql) {
     return new Promise(function(resolve, reject) {
+      if (id <= 0) {
+        return reject('Invalid id range');
+      }
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
 
       var model = modelsFactory(sql);
 
       model.Crawl.findById(id).then(function(crawl) {
-        if (!crawl) {
-          return reject(new Error('No crawls with id ' + id));
+        if (crawl) {
+          return resolve(crawl.dataValues);
+        } else {
+          return resolve();
         }
-        return resolve(crawl.dataValues);
       }).catch(function(error) {
         return reject(error);
       });
@@ -322,9 +326,6 @@ module.exports = {
       model.Crawl.findAll({
         where: ["id >= ? and id <= ?", startId, endId]
       }).then(function(crawls) {
-        if (!crawls) {
-          return reject(new Error('Missing crawls of id', startId, '-', endId));
-        }
         return resolve(_.map(crawls, function(c){ return c.dataValues; }));
       }).catch(function(error) {
         return reject(error);
@@ -351,10 +352,11 @@ module.exports = {
           ['id', 'DESC']
         ]
       }).then(function(crawl) {
-        if (!crawl) {
-          return reject(new Error('No crawls in database'));
+        if (crawl) {
+          return resolve(crawl.dataValues);
+        } else {
+          return resolve();
         }
-        return resolve(crawl.dataValues);
       }).catch(function(error) {
         return reject(error);
       });
