@@ -6,7 +6,7 @@ var rc_util = require('../src/lib/utility.js');
 var invalid_crawl = require('./data/invalid_crawl.json');
 var valid_crawl = require('./data/valid_crawl.json');
 
-var db_url = 'postgres://postgrespostgres@127.0.0.1:5432/circle_test';
+var db_url = 'postgres://edvwmotkfhufno:58eqXN3rshkazZbcWghgnj6xpr@ec2-54-83-46-91.compute-1.amazonaws.com:5432/dcrccfkhk50eh8';
 
 describe('Rawcrawl Util', function() {
   describe('#getRippleds()', function() {
@@ -209,7 +209,7 @@ describe('Rawcrawl Util', function() {
     it("Should return an object with expected properties", function(done) {
       this.timeout(10000);
       var logsql = false;
-      rc_util.getLatestRow('postgres://postgrespostgres@127.0.0.1:5432/circle_test', logsql)
+      rc_util.getLatestRow(db_url, logsql)
       .then(function(row) {
         if (row) {
           expect(row).to.have.property('id');
