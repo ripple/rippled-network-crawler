@@ -10,8 +10,14 @@ function saveDB(crawlJson, dbUrl, logsql) {
   return models.Crawl.create({start_at: crawlJson.start,
                                 end_at: crawlJson.end,
                                 entry_ipp: crawlJson.entry,
-                                data: crawlJson.data,
-                                exceptions: crawlJson.errors});
+                                data: JSON.stringify(crawlJson.data),
+                                exceptions: JSON.stringify(crawlJson.errors)});
+  }).then(function() {
+    onDone();
+  })
+  .catch(function(error) {
+    onDone(error);
+  });
 }
 
 module.exports = function(crawl, dbUrl, logsql) {

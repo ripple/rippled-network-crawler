@@ -272,29 +272,52 @@ module.exports = {
     return out;
   },
 
-  getCrawlById: function(dbUrl, id, logsql) {
+  /*
+  * @param {String} database url
+  * @param {String} id of crawl
+  * @param {Boolean} logsql
+  * @return {Object} row of crawl from db
+  * Takes a database and id to return
+  * the row with that id (which contains a crawl)
+  * Note: See readme for stucture of row in db
+  */
+  getRowById: function(dbUrl, id, logsql) {
     return new Promise(function(resolve, reject) {
+      if (id <= 0) {
+        return reject('Invalid id range');
+      }
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
 
       var model = modelsFactory(sql);
 
       model.Crawl.findById(id).then(function(crawl) {
-        if (!crawl) {
-          return reject(new Error('No crawls with id ' + id));
+        if (crawl) {
+          return resolve(crawl.dataValues);
+        } else {
+          return resolve();
         }
-        return resolve(crawl.dataValues);
       }).catch(function(error) {
         return reject(error);
       });
     });
   },
 
-  getCrawlsByIds: function(dbUrl, startId, endId, logsql) {
+  /*
+  * @param {String} database url
+  * @param {String} start id
+  * @param {String} end id
+  * @param {Boolean} logsql
+  * Takes a database and a range of ids to return
+  * the an array of rows (which contains crawls)
+  * Note: See readme for stucture of row in db
+  */
+  getRowsByIds: function(dbUrl, startId, endId, logsql) {
     return new Promise(function(resolve, reject) {
-      if (endId < startId || startId < 0 || endId < 0)
+      if (endId < startId || startId < 0 || endId < 0) {
         return reject('Invalid id range');
-        
+      }
+
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
 
@@ -303,17 +326,21 @@ module.exports = {
       model.Crawl.findAll({
         where: ["id >= ? and id <= ?", startId, endId]
       }).then(function(crawls) {
-        if (!crawls) {
-          return reject(new Error('Missing crawls of id', startId, '-', endId));
-        }
-        return resolve(crawls);
+        return resolve(_.map(crawls, function(c){ return c.dataValues; }));
       }).catch(function(error) {
         return reject(error);
       });
     });
   },
 
-  getLatestCrawl: function(dbUrl, logsql) {
+  /*
+  * @param {String} database url
+  * @param {Boolean} logsql
+  * Takes a database and returns
+  * the last row (which contains a crawl)
+  * Note: See readme for stucture of row in db
+  */
+  getLatestRow: function(dbUrl, logsql) {
     return new Promise(function(resolve, reject) {
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
@@ -325,10 +352,11 @@ module.exports = {
           ['id', 'DESC']
         ]
       }).then(function(crawl) {
-        if (!crawl) {
-          return reject(new Error('No crawls in database'));
+        if (crawl) {
+          return resolve(crawl.dataValues);
+        } else {
+          return resolve();
         }
-        return resolve(crawl.dataValues);
       }).catch(function(error) {
         return reject(error);
       });
