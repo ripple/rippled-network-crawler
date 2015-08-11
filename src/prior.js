@@ -8,7 +8,7 @@ var Promise = require('bluebird');
 module.exports = function(dbUrl, commander, lastCrawl) {
   return new Promise(function(resolve, reject) {
     function useLatestCrawl(latestCrawl) {
-      var ipps = rc_util.getIpps(latestCrawl.data);
+      var ipps = rc_util.getIpps(latestCrawl);
       if (ipps) {
         selective(ipps, commander)
         .then(resolve)
@@ -21,7 +21,7 @@ module.exports = function(dbUrl, commander, lastCrawl) {
     } else {
       rc_util.getLatestRow(dbUrl, commander.logsql)
       .then(function(row) {
-        useLatestCrawl(row.data)
+        useLatestCrawl(JSON.parse(row.data));
       })
       .catch(function(error) {
         console.error(error.message);

@@ -27,6 +27,8 @@ module.exports = function(sql) {
     timestamps: true,
     underscored: true
   });
+  Crawl.sync({force: false});
+
 
   return {
     Crawl: Crawl

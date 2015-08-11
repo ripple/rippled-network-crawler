@@ -12,12 +12,6 @@ function saveDB(crawlJson, dbUrl, logsql) {
                                 entry_ipp: crawlJson.entry,
                                 data: JSON.stringify(crawlJson.data),
                                 exceptions: JSON.stringify(crawlJson.errors)});
-  }).then(function() {
-    onDone();
-  })
-  .catch(function(error) {
-    onDone(error);
-  });
 }
 
 module.exports = function(crawl, dbUrl, logsql) {
@@ -25,7 +19,7 @@ module.exports = function(crawl, dbUrl, logsql) {
     saveDB(crawl, dbUrl, logsql)
     .then(function() {
       console.log('Stored data crawled at: ' + crawl.start);
-      resolve(crawl);
+      resolve(crawl.data);
     })
     .catch(function(err) {
       console.error(err);    // this is a serious error
