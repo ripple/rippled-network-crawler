@@ -112,11 +112,11 @@ var maxRequests = 100;
 var ipp = '162.217.98.90:51235';
 var crawler = new Crawler(maxRequests);
 crawler.getCrawl(ipp).then(function(response) {
-  src.store(response, db_url, false).then(function {
-    src.store(response, db_url, false).then(function {
+  src.store(response, db_url, false).then(function() {
+    src.store(response, db_url, false).then(function() {
       testDB();
-    })
-  })
+    });
+  });
 });
 
 function testDB() {
