@@ -6,7 +6,9 @@ function callPrior(dbUrl, commander, lastCrawl) {
   src
   .prior(dbUrl, commander, lastCrawl)
   .then(function(crawl) {
-    callPrior(dbUrl, commander, crawl);
+    process.nextTick(function() {
+      callPrior(dbUrl, commander, crawl);
+    });
   })
   .catch(function(err) {
     console.log(err);
