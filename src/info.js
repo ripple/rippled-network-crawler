@@ -20,36 +20,38 @@ function getAvgOut(degrees) {
 }
 
 module.exports = function(dbUrl, id, commander) {
-  id = parseInt(id, 10);
-  rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
-    var body = JSON.parse(row.data);
-    var results = {entry: row.entry_ipp,
-                   general: {},
-                   rippleds: {},
-                   links: {},
-                   degrees: {},
-                   versions: {},
-                   locations: {}};
+  return new Promise(function(resolve, reject) {
+    id = parseInt(id, 10);
+    rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+      var body = JSON.parse(row.data);
+      var results = {entry: row.entry_ipp,
+                     general: {},
+                     rippleds: {},
+                     links: {},
+                     degrees: {},
+                     versions: {},
+                     locations: {}};
 
-    results.rippleds = rc_util.getRippledsC(body);
+      results.rippleds = rc_util.getRippledsC(body);
 
-    results.versions = rc_util.getVersions(body);
+      results.versions = rc_util.getVersions(body);
 
-    results.locations = rc_util.getLocations(body);
+      results.locations = rc_util.getLocations(body);
 
-    results.links = rc_util.getLinks(body);
+      results.links = rc_util.getLinks(body);
 
-    results.degrees = rc_util.getDegrees(body);
+      results.degrees = rc_util.getDegrees(body);
 
-    results.general.nodes = Object.keys(results.rippleds).length;
-    results.general.links = Object.keys(results.links).length;
-    results.general.versions = Object.keys(results.versions).length;
-    results.general.locations = Object.keys(results.locations).length;
-    results.general.avgIn = getAvgIn(results.degrees);
-    results.general.avgOut = getAvgOut(results.degrees);
+      results.general.nodes = Object.keys(results.rippleds).length;
+      results.general.links = Object.keys(results.links).length;
+      results.general.versions = Object.keys(results.versions).length;
+      results.general.locations = Object.keys(results.locations).length;
+      results.general.avgIn = getAvgIn(results.degrees);
+      results.general.avgOut = getAvgOut(results.degrees);
 
-    console.log(results);
-  }).catch(function(error) {
-    console.error(error.message);
+      console.log(results);
+    }).catch(function(error) {
+      reject(error);
+    });
   });
 };
