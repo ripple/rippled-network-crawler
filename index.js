@@ -78,7 +78,7 @@ commander
   .command('forever <ipp> <dbUrl>')
   .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
   .action(function(ipp, dbUrl) {
-    console.log('FOREVER called at:' + moment().format());
+    console.log('FOREVER called at:', moment().format());
     src
     .forever(ipp, dbUrl, commander)
     .catch(function(err) {
