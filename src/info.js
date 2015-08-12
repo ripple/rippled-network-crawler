@@ -50,8 +50,6 @@ module.exports = function(dbUrl, id, commander) {
       results.general.avgOut = getAvgOut(results.degrees);
 
       console.log(results);
-    }).catch(function(error) {
-      reject(error);
-    });
+    }).catch(reject);
   });
 };
