@@ -6,7 +6,7 @@ var rc_util = require('../src/lib/utility.js');
 var invalid_crawl = require('./data/invalid_crawl.json');
 var valid_crawl = require('./data/valid_crawl.json');
 
-var db_url = 'postgres://edvwmotkfhufno:58eqXN3rshkazZbcWghgnj6xpr@ec2-54-83-46-91.compute-1.amazonaws.com:5432/dcrccfkhk50eh8';
+var db_url = 'postgres://postgres:postgres@127.0.0.1:5432/circle_test';
 
 describe('Rawcrawl Util', function() {
   describe('#getRippleds()', function() {
@@ -99,6 +99,26 @@ describe('Rawcrawl Util', function() {
       expect(obj).to.be.an('array');
     });
   });
+});
+
+describe('Database Util', function() {
+  before(function(done) {
+    this.timeout(10000);
+    /* Post two crawls to db for testing */
+    var Crawler = require('../src/lib/crawler.js').Crawler;
+    var src = require('../src/program');
+
+    var maxRequests = 100;
+    var ipp = '162.217.98.90:51235';
+    var crawler = new Crawler(maxRequests);
+    crawler.getCrawl(ipp).then(function(response) {
+      src.store(response, db_url, false).then(function() {
+        src.store(response, db_url, false).then(function() {
+          done();
+        });
+      });
+    });
+  });
   describe('#getRowById()', function() {
     it("Should throw an error when given invalid id", function(done) {
       var id = -1;
@@ -160,7 +180,7 @@ describe('Rawcrawl Util', function() {
     });
     it("Shouldn't throw an error when given valid id", function() {
       var startId = 1;
-      var endId = 5;
+      var endId = 2;
       var logsql = false;
       rc_util.getRowsByIds(db_url, startId, endId, logsql);
     });
