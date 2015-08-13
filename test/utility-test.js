@@ -6,8 +6,7 @@ var rc_util = require('../src/lib/utility.js');
 var invalid_crawl = require('./data/invalid_crawl.json');
 var valid_crawl = require('./data/valid_crawl.json');
 
-//var db_url = 'postgres://postgres:postgres@127.0.0.1:5432/circle_test';
-var db_url = 'postgres://svvrvhaiaqvblb:Y1tFJhSW5YnvA-7b1pJgzcO0F0@ec2-54-243-44-191.compute-1.amazonaws.com:5432/dck7lage8dbjm1'
+var db_url = 'postgres://postgres:postgres@127.0.0.1:5432/circle_test';
 
 describe('Rawcrawl Util', function() {
   describe('#getRippleds()', function() {
