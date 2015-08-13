@@ -8,6 +8,8 @@ var DB = require('./database');
 var modelsFactory = require('./models.js');
 var Promise = require('bluebird');
 
+var toNormPubKey = {};
+
 module.exports = {
 
   /*
@@ -28,7 +30,13 @@ module.exports = {
 
         // peer properties
         var p_v = peer.version;
-        var p_pk = normalizePubKey(peer.public_key);
+        var p_pk;
+        if (toNormPubKey[peer.public_key]) {
+          p_pk = toNormPubKey[peer.public_key];
+        } else {
+          p_pk = normalizePubKey(peer.public_key);
+          toNormPubKey[peer.public_key] = p_pk;
+        }
         var p_ipp;
         try {
           p_ipp = normalizeIpp(peer.ip, peer.port);
@@ -101,7 +109,13 @@ module.exports = {
       _.each(n_peers, function(peer) {
 
         // peer properties
-        var p_pk = normalizePubKey(peer.public_key);
+        var p_pk;
+        if (toNormPubKey[peer.public_key]) {
+          p_pk = toNormPubKey[peer.public_key];
+        } else {
+          p_pk = normalizePubKey(peer.public_key);
+          toNormPubKey[peer.public_key] = p_pk;
+        }
         var p_type = peer.type;
 
         var a, b;
