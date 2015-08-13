@@ -8,6 +8,8 @@ var DB = require('./database');
 var modelsFactory = require('./models.js');
 var Promise = require('bluebird');
 
+var toNormPubKey = {};
+
 module.exports = {
 
   /*
@@ -18,7 +20,6 @@ module.exports = {
   */
   getRippleds: function(nodes) {
     var rippleds = {};
-    var toNormPubKey = {};
     _.each(nodes, function(node) {
 
       // node properties
@@ -89,7 +90,6 @@ module.exports = {
   */
   getLinks: function(nodes) {
     var rippleds = this.getRippleds(nodes);
-    var toNormPubKey = {};
     // Create ippToPk using rippleds
     var ippToPk = {};
     _.each(Object.keys(rippleds), function(pk) {
