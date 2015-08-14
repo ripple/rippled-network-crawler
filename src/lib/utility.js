@@ -7,6 +7,7 @@ var _ = require('lodash');
 var DB = require('./database');
 var modelsFactory = require('./models.js');
 var Promise = require('bluebird');
+var fs = require('fs');
 
 module.exports = {
 
@@ -359,6 +360,19 @@ module.exports = {
         }
       }).catch(function(error) {
         return reject(error);
+      });
+    });
+  },
+
+  getCrawlFromFile: function(dir) {
+    return new Promise(function(resolve, reject) {
+      var filename = ??? // Get file with latest *_date
+      fs.readFile(filename, function(error, data) {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(data);
+        }
       });
     });
   }

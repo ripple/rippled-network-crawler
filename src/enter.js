@@ -11,9 +11,15 @@ module.exports = function(ipp, commander) {
     var crawler = new Crawler(maxRequests, logger);
     crawler.getCrawl(ipp)
       .then(function(response) {
+        if (commander.file) {
+          src
+          .store_f(response, commander.file, commander.logsql)
+          .then(resolve)
+          .catch(reject);
+        }
         if (commander.store) {
           src
-          .store(response, commander.store, commander.logsql)
+          .store_db(response, commander.store)
           .then(resolve)
           .catch(reject);
         } else if (commander.readable) {

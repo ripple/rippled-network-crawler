@@ -5,8 +5,10 @@ var modelsFactory = require('./lib/models.js');
 var selective = require('./program').selective;
 var Promise = require('bluebird');
 
-module.exports = function(dbUrl, commander, lastCrawl) {
+module.exports = function(commander, lastCrawl) {
   return new Promise(function(resolve, reject) {
+
+
     function useLatestCrawl(latestCrawl) {
       var ipps = rc_util.getIpps(latestCrawl);
       if (ipps) {
@@ -19,14 +21,21 @@ module.exports = function(dbUrl, commander, lastCrawl) {
     if (lastCrawl) {
       useLatestCrawl(lastCrawl);
     } else {
-      rc_util.getLatestRow(dbUrl, commander.logsql)
-      .then(function(row) {
-        useLatestCrawl(JSON.parse(row.data));
-      })
-      .catch(function(error) {
-        console.error(error.message);
-        reject(error);
-      });
+      if (commander.file) {
+        rc_util.getCrawlFromFile(commander.file)
+        .then(function(crawl) {
+          useLatestCrawl(JSON.parse(crawl.data));
+        })
+        .catch(reject);
+      } else if (commander.store) {
+        rc_util.getLatestRow(dbUrl, commander.logsql)
+        .then(function(row) {
+          useLatestCrawl(JSON.parse(row.data));
+        })
+        .catch(reject);
+      } else {
+        reject("Needs either -f or -s as source of previous crawl");
+      }
     }
   });
 };

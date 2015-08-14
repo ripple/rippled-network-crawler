@@ -12,11 +12,13 @@ commander
   .option('-r, --readable',
           'Output json with four space indentation')
   .option('-s, --store <dbUrl>',
-          'stores crawl output into the database specified (quietly)')
+          'Store crawl output into the database specified (quietly)')
   .option('-q, --quiet',
           'Only output crawl json, all logging is ignored')
   .option('-l, --logsql',
-          'Log all sequelize queries and ddl');
+          'Log all sequelize queries and ddl')
+  .option('-f, --file <dir>',
+          'Store crawl output into file in directory specified (only works for forever for now)');
 
 commander
   .command('enter <ipp>')
@@ -42,11 +44,11 @@ commander
   });
 
 commander
-  .command('prior <dbUrl>')
-  .description('Crawl selectively on ipps from latest crawl in the database')
+  .command('prior')
+  .description('Crawl selectively on ipps from latest crawl in db or file')
   .action(function(dbUrl) {
     src
-    .prior(dbUrl, commander)
+    .prior(commander)
     .catch(function(err) {
       console.error(err);
     });
@@ -75,12 +77,12 @@ commander
   });
 
 commander
-  .command('forever <ipp> <dbUrl>')
-  .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
+  .command('forever <ipp>')
+  .description('run crawl forever starting from ipp')
   .action(function(ipp, dbUrl) {
     console.log('FOREVER called at:' + moment().format());
     src
-    .forever(ipp, dbUrl, commander)
+    .forever(ipp, commander)
     .catch(function(err) {
       console.error(err);
       console.log('FOREVER encountered an error. Shutting down...');

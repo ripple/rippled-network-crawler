@@ -2,7 +2,7 @@
 var src = require('./program');
 var Promise = require('bluebird');
 
-function callPrior(dbUrl, commander, lastCrawl) {
+function callPrior(commander, lastCrawl) {
   src
   .prior(dbUrl, commander, lastCrawl)
   .then(function(crawl) {
@@ -13,13 +13,12 @@ function callPrior(dbUrl, commander, lastCrawl) {
   });
 }
 
-module.exports = function(ipp, dbUrl, commander) {
+module.exports = function(ipps, commander) {
   return new Promise(function(resolve, reject) {
-    commander.store = dbUrl;  // turning on -s dbUrl flag.
     src
     .enter(ipp, commander)
     .then(function(crawl) {
-      callPrior(dbUrl, commander, crawl);
+      callPrior(commander, crawl);
     })
     .catch(reject);
   });
