@@ -19,9 +19,9 @@ module.exports = function(crawl, dbUrl, logsql) {
   return new Promise(function(resolve, reject) {
     saveDB(crawl, dbUrl, logsql)
     .then(function(row) {
-      console.log('Stored crawl %d (%s) to %s at %s',
-              row.id, moment(crawl.start).format(), dbUrl, moment().format());
-      resolve(crawl.data);
+      console.log('Stored crawl %d (%s) \t at %s \t to %s',
+              row.id, moment(crawl.start).format(), moment().format(), dbUrl);
+      resolve(row);
     })
     .catch(function(err) {
       console.error(err);    // this is a serious error

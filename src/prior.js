@@ -23,10 +23,7 @@ module.exports = function(dbUrl, commander, lastCrawl) {
       .then(function(row) {
         useLatestCrawl(JSON.parse(row.data));
       })
-      .catch(function(error) {
-        console.error(error.message);
-        reject(error);
-      });
+      .catch(reject);
     }
   });
 };

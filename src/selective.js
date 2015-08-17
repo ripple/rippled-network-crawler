@@ -6,23 +6,29 @@ var Promise = require('bluebird');
 
 module.exports = function(ipps, commander) {
   return new Promise(function(resolve, reject) {
-    var logger = commander.quiet ? {log: _.noop, error: _.noop} : console;
-    var maxRequests = commander.max ? parseInt(commander.max, 10) : 100;
+    var logger = {log: _.noop, error: _.noop}; // no crawler logging for now
+    var maxRequests = commander.count ? parseInt(commander.count, 10) : 100;
     var crawler = new Crawler(maxRequests, logger);
-    crawler
-    .getSelCrawl(ipps)
-    .then(function(response) {
+    crawler.getSelCrawl(ipps)
+    .then(function(crawl) {
+      // Store in database
       if (commander.store) {
         src
-        .store(response, commander.store, commander.logsql)
-        .then(resolve)
-        .catch(reject);
-      } else if (commander.readable) {
-        console.log(JSON.stringify(response, null, 4));
-      } else {
-        console.log(JSON.stringify(response));
+        .store(crawl, commander.store, commander.logsql)
+        // Send message
+        .then(function(row) {
+          if (commander.message) {
+            src
+            .message(row, commander.message)
+            //.then(console.log) // todo logQueue option
+            .catch(reject); // message error
+          }
+        })
+        .catch(reject); // store error
       }
+      return crawl;
     })
-    .catch(reject);
+    .then(resolve) // return crawl
+    .catch(reject); // getCrawl error
   });
 };

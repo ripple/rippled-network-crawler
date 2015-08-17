@@ -7,7 +7,7 @@ function callPrior(dbUrl, commander, lastCrawl) {
   .prior(dbUrl, commander, lastCrawl)
   .then(function(crawl) {
     process.nextTick(function() {
-      callPrior(dbUrl, commander, crawl);
+      callPrior(dbUrl, commander, crawl.data);
     });
   })
   .catch(function(err) {
@@ -21,7 +21,7 @@ module.exports = function(ipp, dbUrl, commander) {
     src
     .enter(ipp, commander)
     .then(function(crawl) {
-      callPrior(dbUrl, commander, crawl);
+      callPrior(dbUrl, commander, crawl.data);
     })
     .catch(reject);
   });

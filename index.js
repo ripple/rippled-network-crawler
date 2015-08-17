@@ -4,19 +4,20 @@
 var commander = require('commander');
 var src = require('./src/program');
 var moment = require('moment');
+var _ = require('lodash');
 
 commander
   .version(require('./package.json').version)
-  .option('-m, --max <count>',
+  .option('-c, --count <count>',
           'Max number of http requests to have open at once, default 100')
-  .option('-r, --readable',
-          'Output json with four space indentation')
   .option('-s, --store <dbUrl>',
           'stores crawl output into the database specified (quietly)')
   .option('-q, --quiet',
-          'Only output crawl json, all logging is ignored')
+          'Won\'t output crawl json')
   .option('-l, --logsql',
-          'Log all sequelize queries and ddl');
+          'Log all sequelize queries and ddl')
+  .option('-m, --message <queueUrl>',
+          'Send message for each crawl stored to db (needs -s) to sqs queue');
 
 commander
   .command('enter <ipp>')
@@ -24,9 +25,8 @@ commander
   .action(function(ipp) {
     src
     .enter(ipp, commander)
-    .catch(function(err) {
-      console.error(err);
-    });
+    .then(commander.quiet ? _.noop : console.log)
+    .catch(console.error);
   });
 
 commander
@@ -36,9 +36,8 @@ commander
     var ipps = otherIpps ? [ipp].concat(otherIpps) : [ipp];
     src
     .selective(ipps, commander)
-    .catch(function(err) {
-      console.error(err);
-    });
+    .then(commander.quiet ? _.noop : console.log)
+    .catch(console.error);
   });
 
 commander
@@ -47,9 +46,8 @@ commander
   .action(function(dbUrl) {
     src
     .prior(dbUrl, commander)
-    .catch(function(err) {
-      console.error(err);
-    });
+    .then(commander.quiet ? _.noop : console.log)
+    .catch(console.error)
   });
 
 commander
@@ -58,9 +56,8 @@ commander
   .action(function(dbUrl, id) {
     src
     .info(dbUrl, id, commander)
-    .catch(function(err) {
-      console.error(err);
-    });
+    .then(console.log)
+    .catch(console.error);
   });
 
 commander
@@ -69,18 +66,17 @@ commander
   .action(function(dbUrl, id) {
     src
     .graphify(dbUrl, id, commander)
-    .catch(function(err) {
-      console.error(err);
-    });
+    .then(console.log)
+    .catch(console.error);
   });
 
 commander
   .command('forever <ipp> <dbUrl>')
   .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
   .action(function(ipp, dbUrl) {
-    console.log('FOREVER called at:', moment().format());
     src
     .forever(ipp, dbUrl, commander)
+    .then(commander.quiet ? _.noop : console.log)
     .catch(function(err) {
       console.error(err);
       console.log('FOREVER encountered an error. Shutting down...');
