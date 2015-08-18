@@ -6,25 +6,29 @@ var Promise = require('bluebird');
 
 module.exports = function(ipp, commander) {
   return new Promise(function(resolve, reject) {
-    var logger = commander.quiet ? {log: _.noop, error: _.noop} : console;
-    var maxRequests = commander.max ? parseInt(commander.max, 10) : 100;
+    var logger = {log: _.noop, error: _.noop}; // no crawler logging for now
+    var maxRequests = commander.count ? parseInt(commander.count, 10) : 100;
     var crawler = new Crawler(maxRequests, logger);
     crawler.getCrawl(ipp)
-      .then(function(response) {
-        if (commander.store) {
-          src
-          .store(response, commander.store, commander.logsql)
-          .then(resolve)
-          .catch(reject);
-        } else if (commander.readable) {
-          console.log(JSON.stringify(response, null, 4));
-        } else {
-          console.log(JSON.stringify(response));
-        }
-      })
-      .catch(function(error) {
-        console.error('error:', error.message);
-        reject(error);
-      });
+    .then(function(crawl) {
+      // Store in database
+      if (commander.store) {
+        src
+        .store(crawl, commander.store, commander.logsql)
+        // Send message
+        .then(function(row) {
+          if (commander.message) {
+            src
+            .message(row, commander.message)
+            //.then(console.log) // todo logQueue option
+            .catch(reject); // message error
+          }
+        })
+        .catch(reject); // store error
+      }
+      return crawl;
+    })
+    .then(resolve) // return crawl
+    .catch(reject); // getCrawl error
   });
 };

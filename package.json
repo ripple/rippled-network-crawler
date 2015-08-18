@@ -9,6 +9,7 @@
   },
   "author": "Souren Papazian",
   "dependencies": {
+    "aws-sdk": "^2.1.45",
     "bluebird": "^2.9.27",
     "chai": "^3.0.0",
     "check-types": "^3.3.0",

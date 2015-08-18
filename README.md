@@ -26,7 +26,6 @@ $ rippled-network-crawler --help
 
   Usage: rippled-network-crawler [options] [command]
 
-
   Commands:
 
     enter <ipp>                     Crawl ipp and its peers recursively
@@ -38,13 +37,13 @@ $ rippled-network-crawler --help
 
   Options:
 
-    -h, --help           output usage information
-    -V, --version        output the version number
-    -m, --max <count>    Max number of http requests to have open at once, default 100
-    -r, --readable       Output json with four space indentation
-    -s, --store <dbUrl>  stores crawl output into the database specified (quietly)
-    -q, --quiet          Only output crawl json, all logging is ignored
-    -l, --logsql         Log all sequelize queries and ddl
+    -h, --help                output usage information
+    -V, --version             output the version number
+    -c, --count <count>       Max number of http requests to have open at once, default 100
+    -s, --store <dbUrl>       stores crawl output into the database specified (quietly)
+    -q, --quiet               Won't output crawl json
+    -l, --logsql              Log all sequelize queries and ddl
+    -m, --message <queueUrl>  Send message for each crawl stored to db (needs -s) to sqs queue
 ```
 
 ## Output structure
