@@ -20,11 +20,11 @@ module.exports = function(ipp, commander) {
           if (commander.message) {
             src
             .message(row, commander.message)
-            //.then(console.log) // todo logQueue option
-            .catch(reject); // message error
+            .then(console.log) // todo logQueue option
+            .catch(console.error); // message error
           }
         })
-        .catch(reject); // store error
+        .catch(console.error); // store error
       }
       return crawl;
     })

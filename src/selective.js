@@ -21,10 +21,10 @@ module.exports = function(ipps, commander) {
             src
             .message(row, commander.message)
             //.then(console.log) // todo logQueue option
-            .catch(reject); // message error
+            .catch(console.error); // message error
           }
         })
-        .catch(reject); // store error
+        .catch(console.error); // store error
       }
       return crawl;
     })
