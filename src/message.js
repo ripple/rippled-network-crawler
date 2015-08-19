@@ -2,6 +2,7 @@ var AWS = require('aws-sdk');
 var moment = require('moment');
 AWS.config.region = 'us-west-2';
 var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+var Promise = require('bluebird');
 
 module.exports = function(row, queueUrl) {
   return new Promise(function(resolve, reject) {
