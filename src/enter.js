@@ -20,7 +20,7 @@ module.exports = function(ipp, commander) {
           if (commander.message) {
             src
             .message(row, commander.message)
-            .then(console.log) // todo logQueue option
+            //.then(console.log) // todo logQueue option
             .catch(console.error); // message error
           }
         })
