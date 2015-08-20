@@ -208,3 +208,39 @@ And there are various forms for each element (connected peer) in `active`:
       "version": "rippled-0.28.0-rc3"
     },
 ```
+
+# Local Development
+
+To run the crawler locally, you'll need:
+
+* Docker (``apt-get install docker``)
+* Docker-compose (``pip install docker-compose``)
+
+To build the environment:
+
+```
+$ docker-compose build
+```
+
+To bring up the environment:
+
+```
+$ docker-compose up
+```
+
+The crawler will now be running and storing to a local postgres container.
+
+Any modifications to the code will require a restart of the crawler container.
+Usually you can ^C and re-run ``docker-compose up crawler``
+
+If you need a shell:
+
+```
+$ docker-compose run crawler /bin/bash
+```
+
+To run tests:
+
+```
+$ docker-compose run crawler npm test
+```

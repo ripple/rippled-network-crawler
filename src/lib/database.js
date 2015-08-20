@@ -17,9 +17,6 @@ module.exports = {
       sql = new Sequelize(dbUrl,
       {
         logging: log,
-        dialectOptions: {
-          ssl: true
-        },
         pool: {
           maxConnections: 10,
           minConnections: 0,
