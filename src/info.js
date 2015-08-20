@@ -1,6 +1,7 @@
 'use strict';
 var rc_util = require('./lib/utility.js');
 var _ = require('lodash');
+var Promise = require('bluebird');
 
 function getAvgIn(degrees) {
   var sum = 0;
