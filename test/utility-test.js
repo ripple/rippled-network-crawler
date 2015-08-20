@@ -6,8 +6,6 @@ var rc_util = require('../src/lib/utility.js');
 var invalid_crawl = require('./data/invalid_crawl.json');
 var valid_crawl = require('./data/valid_crawl.json');
 
-var db_url = 'postgres://postgres:postgres@127.0.0.1:5432/circle_test';
-
 describe('Rawcrawl Util', function() {
   describe('#getRippleds()', function() {
     it("Shouldn't throw an error when given valid crawl data", function() {
@@ -112,8 +110,8 @@ describe('Database Util', function() {
     var ipp = '162.217.98.90:51235';
     var crawler = new Crawler(maxRequests);
     crawler.getCrawl(ipp).then(function(response) {
-      src.store(response, db_url, false).then(function() {
-        src.store(response, db_url, false).then(function() {
+      src.store(response, false).then(function() {
+        src.store(response, false).then(function() {
           done();
         });
       });
@@ -123,7 +121,7 @@ describe('Database Util', function() {
     it("Should throw an error when given invalid id", function(done) {
       var id = -1;
       var logsql = false;
-      rc_util.getRowById(db_url, id, logsql)
+      rc_util.getRowById(id, logsql)
       .catch(function(error) {
         assert.strictEqual(error, "Invalid id range");
       }).then(done, done);
@@ -131,13 +129,13 @@ describe('Database Util', function() {
     it("Shouldn't throw an error when given valid id", function() {
       var id = 1;
       var logsql = false;
-      rc_util.getRowById(db_url, id, logsql);
+      rc_util.getRowById(id, logsql);
     });
     it("Should return an object with expected properties", function(done) {
       this.timeout(10000);
       var id = 1;
       var logsql = false;
-      rc_util.getRowById(db_url, id, logsql)
+      rc_util.getRowById(id, logsql)
       .then(function(row) {
         if (row) {
           expect(row).to.have.property('id');
@@ -173,7 +171,7 @@ describe('Database Util', function() {
       var startId = -1;
       var endId = -5;
       var logsql = false;
-      rc_util.getRowsByIds(db_url, startId, endId, logsql)
+      rc_util.getRowsByIds(startId, endId, logsql)
       .catch(function(error) {
         assert.strictEqual(error, "Invalid id range");
       }).then(done, done);
@@ -182,14 +180,14 @@ describe('Database Util', function() {
       var startId = 1;
       var endId = 2;
       var logsql = false;
-      rc_util.getRowsByIds(db_url, startId, endId, logsql);
+      rc_util.getRowsByIds(startId, endId, logsql);
     });
     it("Should return an object with expected properties", function(done) {
       this.timeout(10000);
       var startId = 1;
       var endId = 2;
       var logsql = false;
-      rc_util.getRowsByIds(db_url, startId, endId, logsql)
+      rc_util.getRowsByIds(startId, endId, logsql)
       .then(function(rows) {
         var row = rows[0];
         if (row) {
@@ -224,12 +222,12 @@ describe('Database Util', function() {
   describe('#getLatestRow()', function() {
     it("Shouldn't throw an error when given valid database", function() {
       var logsql = false;
-      rc_util.getLatestRow(db_url, logsql);
+      rc_util.getLatestRow(logsql);
     });
     it("Should return an object with expected properties", function(done) {
       this.timeout(10000);
       var logsql = false;
-      rc_util.getLatestRow(db_url, logsql)
+      rc_util.getLatestRow(logsql)
       .then(function(row) {
         if (row) {
           expect(row).to.have.property('id');

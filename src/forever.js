@@ -2,12 +2,12 @@
 var src = require('./program');
 var Promise = require('bluebird');
 
-function callPrior(dbUrl, commander, lastCrawl) {
+function callPrior(commander, lastCrawl) {
   src
-  .prior(dbUrl, commander, lastCrawl)
+  .prior(commander, lastCrawl)
   .then(function(crawl) {
     process.nextTick(function() {
-      callPrior(dbUrl, commander, crawl.data);
+      callPrior(commander, crawl.data);
     });
   })
   .catch(function(err) {
@@ -15,13 +15,13 @@ function callPrior(dbUrl, commander, lastCrawl) {
   });
 }
 
-module.exports = function(ipp, dbUrl, commander) {
+module.exports = function(ipp, commander) {
   return new Promise(function(resolve, reject) {
-    commander.store = dbUrl;  // turning on -s dbUrl flag.
+    commander.store = true;  // turning on -s flag.
     src
     .enter(ipp, commander)
     .then(function(crawl) {
-      callPrior(dbUrl, commander, crawl.data);
+      callPrior(commander, crawl.data);
     })
     .catch(reject);
   });

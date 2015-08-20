@@ -297,13 +297,13 @@ module.exports = {
   * the row with that id (which contains a crawl)
   * Note: See readme for stucture of row in db
   */
-  getRowById: function(dbUrl, id, logsql) {
+  getRowById: function(id, logsql) {
     return new Promise(function(resolve, reject) {
       if (id <= 0) {
         return reject('Invalid id range');
       }
       var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
+      var sql = DB.initSql(log);
 
       return modelsFactory(sql).then(function(model) {
         return model.Crawl.findById(id).then(function(crawl) {
@@ -328,14 +328,14 @@ module.exports = {
   * the an array of rows (which contains crawls)
   * Note: See readme for stucture of row in db
   */
-  getRowsByIds: function(dbUrl, startId, endId, logsql) {
+  getRowsByIds: function(startId, endId, logsql) {
     return new Promise(function(resolve, reject) {
       if (endId < startId || startId < 0 || endId < 0) {
         return reject('Invalid id range');
       }
 
       var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
+      var sql = DB.initSql(log);
 
       return modelsFactory(sql).then(function(model) {
         return model.Crawl.findAll({
@@ -356,10 +356,10 @@ module.exports = {
   * the last row (which contains a crawl)
   * Note: See readme for stucture of row in db
   */
-  getLatestRow: function(dbUrl, logsql) {
+  getLatestRow: function(logsql) {
     return new Promise(function(resolve, reject) {
       var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
+      var sql = DB.initSql(log);
 
       return modelsFactory(sql).then(function(model) {
         return model.Crawl.findOne({

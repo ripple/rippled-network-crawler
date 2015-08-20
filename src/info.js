@@ -19,10 +19,10 @@ function getAvgOut(degrees) {
   return sum / Object.keys(degrees).length;
 }
 
-module.exports = function(dbUrl, id, commander) {
+module.exports = function(id, commander) {
   return new Promise(function(resolve, reject) {
     id = parseInt(id, 10);
-    rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+    rc_util.getRowById(id, commander.logsql).then(function(row) {
       var body = JSON.parse(row.data);
       var results = {entry: row.entry_ipp,
                      general: {},

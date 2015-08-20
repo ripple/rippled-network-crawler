@@ -24,23 +24,23 @@ To list program options and commands run `--help or -h`
 ```
 $ rippled-network-crawler --help
 
-  Usage: rippled-network-crawler [options] [command]
+  Usage: DATABASE_URL=YOUR_DATABASE_URL rippled-network-crawler [options] [command]
 
   Commands:
 
     enter <ipp>                     Crawl ipp and its peers recursively
     selective <ipp> [otherIpps...]  Crawl specified ipps without expanding crawl to peers
-    prior <dbUrl>                   Crawl selectively on ipps from latest crawl in the database
-    info <dbUrl> <id>               Get information about a crawl in the database by id
-    graphify <dbUrl> <id>           Get a json representing a d3 graph of a crawl by id
-    forever <ipp> <dbUrl>           run crawl forever starting from ipp (-s flag will be turned on automatically)
+    prior                           Crawl selectively on ipps from latest crawl in the database
+    info <id>                       Get information about a crawl in the database by id
+    graphify <id>                   Get a json representing a d3 graph of a crawl by id
+    forever <ipp>                   run crawl forever starting from ipp (-s flag will be turned on automatically)
 
   Options:
 
     -h, --help                output usage information
     -V, --version             output the version number
     -c, --count <count>       Max number of http requests to have open at once, default 100
-    -s, --store <dbUrl>       stores crawl output into the database specified (quietly)
+    -s, --store               stores crawl output into the database specified (quietly)
     -q, --quiet               Won't output crawl json
     -l, --logsql              Log all sequelize queries and ddl
     -m, --message <queueUrl>  Send message for each crawl stored to db (needs -s) to sqs queue

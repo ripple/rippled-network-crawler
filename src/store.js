@@ -4,9 +4,9 @@ var modelsFactory = require('./lib/models.js');
 var Promise = require('bluebird');
 var moment = require('moment');
 
-function saveDB(crawlJson, dbUrl, logsql) {
+function saveDB(crawlJson, logsql) {
   var log = logsql ? console.log : false;
-  var sql = DB.initSql(dbUrl, log);
+  var sql = DB.initSql(log);
   return modelsFactory(sql).then(function(models) {
     return models.Crawl.create({start_at: crawlJson.start,
                                 end_at: crawlJson.end,
@@ -16,12 +16,12 @@ function saveDB(crawlJson, dbUrl, logsql) {
   });
 }
 
-module.exports = function(crawl, dbUrl, logsql) {
+module.exports = function(crawl, logsql) {
   return new Promise(function(resolve, reject) {
-    saveDB(crawl, dbUrl, logsql)
+    saveDB(crawl, logsql)
     .then(function(row) {
-      console.log('Stored crawl %d (%s) \t at %s \t to %s',
-              row.id, moment(crawl.start).format(), moment().format(), dbUrl);
+      console.log('Stored crawl %d (%s) \t at %s \t',
+              row.id, moment(crawl.start).format(), moment().format());
       resolve(row);
     })
     .catch(function(err) {

@@ -36,9 +36,9 @@ function graphify(crawl) {
   return results;
 }
 
-module.exports = function(dbUrl, id, commander) {
+module.exports = function(id, commander) {
   return new Promise(function(resolve, reject) {
-    rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+    rc_util.getRowById(id, commander.logsql).then(function(row) {
       var graph = graphify(JSON.parse(row.data));
       if (commander.readable) {
         console.log(JSON.stringify(graph, null, 4));

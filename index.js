@@ -10,8 +10,8 @@ commander
   .version(require('./package.json').version)
   .option('-c, --count <count>',
           'Max number of http requests to have open at once, default 100')
-  .option('-s, --store <dbUrl>',
-          'stores crawl output into the database specified (quietly)')
+  .option('-s, --store',
+          'stores crawl output into the database specified in DATABASE_URL (quietly)')
   .option('-q, --quiet',
           'Won\'t output crawl json')
   .option('-l, --logsql',
@@ -41,41 +41,41 @@ commander
   });
 
 commander
-  .command('prior <dbUrl>')
+  .command('prior')
   .description('Crawl selectively on ipps from latest crawl in the database')
-  .action(function(dbUrl) {
+  .action(function() {
     src
-    .prior(dbUrl, commander)
+    .prior(commander)
     .then(commander.quiet ? _.noop : console.log)
     .catch(console.error)
   });
 
 commander
-  .command('info <dbUrl> <id>')
+  .command('info <id>')
   .description('Get information about a crawl in the database by id')
-  .action(function(dbUrl, id) {
+  .action(function(id) {
     src
-    .info(dbUrl, id, commander)
+    .info(id, commander)
     .then(console.log)
     .catch(console.error);
   });
 
 commander
-  .command('graphify <dbUrl> <id>')
+  .command('graphify <id>')
   .description('Get a json representing a d3 graph of a crawl by id')
-  .action(function(dbUrl, id) {
+  .action(function(id) {
     src
-    .graphify(dbUrl, id, commander)
+    .graphify(id, commander)
     .then(console.log)
     .catch(console.error);
   });
 
 commander
-  .command('forever <ipp> <dbUrl>')
+  .command('forever <ipp>')
   .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
-  .action(function(ipp, dbUrl) {
+  .action(function(ipp) {
     src
-    .forever(ipp, dbUrl, commander)
+    .forever(ipp, commander)
     .then(commander.quiet ? _.noop : console.log)
     .catch(function(err) {
       console.error(err);

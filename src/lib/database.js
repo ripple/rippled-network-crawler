@@ -3,8 +3,16 @@ var Sequelize = require('sequelize');
 var sql;
 var sqlInited;
 
+var dbUrl
+if (process.env.DATABASE_URL) {
+  dbUrl = process.env.DATABASE_URL;
+} else {
+  throw new Error('missing required DATABASE_URL')
+}
+
 module.exports = {
-  initSql: function(dbUrl, log) {
+  initSql: function(log) {
+
     if (!sqlInited) {
       sql = new Sequelize(dbUrl,
       {
