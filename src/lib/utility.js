@@ -44,6 +44,8 @@ module.exports = {
           p_ipp = undefined;
         }
 
+        var uptime = peer.uptime;
+
         // Fill in rippled
         var rippled = rippleds[p_pk];
         if (rippled) {
@@ -54,7 +56,7 @@ module.exports = {
             rippled.version = p_v;
           }
         } else {
-          rippleds[p_pk] = {ipp: p_ipp, version: p_v};
+          rippleds[p_pk] = {ipp: p_ipp, version: p_v, uptime: uptime};
         }
 
       });

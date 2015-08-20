@@ -1,6 +1,6 @@
 {
   "name": "rippled-network-crawler",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "command line interface to crawl a rippled network",
   "license": "ISC",
   "main": "index.js",
