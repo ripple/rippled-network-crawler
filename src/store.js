@@ -7,12 +7,13 @@ var moment = require('moment');
 function saveDB(crawlJson, dbUrl, logsql) {
   var log = logsql ? console.log : false;
   var sql = DB.initSql(dbUrl, log);
-  var models = modelsFactory(sql);
-  return models.Crawl.create({start_at: crawlJson.start,
+  return modelsFactory(sql).then(function(models) {
+    return models.Crawl.create({start_at: crawlJson.start,
                                 end_at: crawlJson.end,
                                 entry_ipp: crawlJson.entry,
                                 data: JSON.stringify(crawlJson.data),
                                 exceptions: JSON.stringify(crawlJson.errors)});
+  });
 }
 
 module.exports = function(crawl, dbUrl, logsql) {
