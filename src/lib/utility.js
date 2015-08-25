@@ -305,16 +305,16 @@ module.exports = {
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
 
-      var model = modelsFactory(sql);
-
-      model.Crawl.findById(id).then(function(crawl) {
-        if (crawl) {
-          return resolve(crawl.dataValues);
-        } else {
-          return resolve();
-        }
-      }).catch(function(error) {
-        return reject(error);
+      return modelsFactory(sql).then(function(model) {
+        return model.Crawl.findById(id).then(function(crawl) {
+          if (crawl) {
+            return resolve(crawl.dataValues);
+          } else {
+            return resolve();
+          }
+        }).catch(function(error) {
+          return reject(error);
+        });
       });
     });
   },
@@ -337,14 +337,14 @@ module.exports = {
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
 
-      var model = modelsFactory(sql);
-
-      model.Crawl.findAll({
-        where: ["id >= ? and id <= ?", startId, endId]
-      }).then(function(crawls) {
-        return resolve(_.map(crawls, function(c){ return c.dataValues; }));
-      }).catch(function(error) {
-        return reject(error);
+      return modelsFactory(sql).then(function(model) {
+        return model.Crawl.findAll({
+          where: ["id >= ? and id <= ?", startId, endId]
+        }).then(function(crawls) {
+          return resolve(_.map(crawls, function(c){ return c.dataValues; }));
+        }).catch(function(error) {
+          return reject(error);
+        });
       });
     });
   },
@@ -361,20 +361,20 @@ module.exports = {
       var log = logsql ? console.log : false;
       var sql = DB.initSql(dbUrl, log);
 
-      var model = modelsFactory(sql);
-
-      model.Crawl.findOne({
-        order: [
-          ['id', 'DESC']
-        ]
-      }).then(function(crawl) {
-        if (crawl) {
-          return resolve(crawl.dataValues);
-        } else {
-          return resolve();
-        }
-      }).catch(function(error) {
-        return reject(error);
+      return modelsFactory(sql).then(function(model) {
+        return model.Crawl.findOne({
+          order: [
+            ['id', 'DESC']
+          ]
+        }).then(function(crawl) {
+          if (crawl) {
+            return resolve(crawl.dataValues);
+          } else {
+            return resolve();
+          }
+        }).catch(function(error) {
+          return reject(error);
+        });
       });
     });
   }
