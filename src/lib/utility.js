@@ -55,6 +55,9 @@ module.exports = {
           if (!rippled.version) {
             rippled.version = p_v;
           }
+          if (!rippled.uptime || rippled.uptime<uptime) {
+            rippled.uptime = uptime;
+          }
         } else {
           rippleds[p_pk] = {ipp: p_ipp, version: p_v, uptime: uptime};
         }
