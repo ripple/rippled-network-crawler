@@ -30,8 +30,7 @@ module.exports = function(dbUrl, id, commander) {
                      rippleds: {},
                      links: {},
                      degrees: {},
-                     versions: {},
-                     locations: {}};
+                     versions: {}};
 
       results.rippleds = rc_util.getRippledsC(body);
 
@@ -44,7 +43,6 @@ module.exports = function(dbUrl, id, commander) {
       results.general.nodes = Object.keys(results.rippleds).length;
       results.general.links = Object.keys(results.links).length;
       results.general.versions = Object.keys(results.versions).length;
-      results.general.locations = Object.keys(results.locations).length;
       results.general.avgIn = getAvgIn(results.degrees);
       results.general.avgOut = getAvgOut(results.degrees);
 
