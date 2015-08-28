@@ -37,8 +37,6 @@ module.exports = function(dbUrl, id, commander) {
 
       results.versions = rc_util.getVersions(body);
 
-      results.locations = rc_util.getLocations(body);
-
       results.links = rc_util.getLinks(body);
 
       results.degrees = rc_util.getDegrees(body);

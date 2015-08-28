@@ -1,5 +1,4 @@
 'use strict';
-var geoip = require('geoip-lite');
 var crawler = require('./crawler.js');
 var normalizeIpp = crawler.normalizeIpp;
 var normalizePubKey = crawler.normalizePubKey;
@@ -187,6 +186,7 @@ module.exports = {
   * Takes a raw crawl and returns a dictionary of locations with their counts.
   * Locations are in the format COUNTRY_CITY (note that city might be missing).
   */
+  /*
   getLocations: function(nodes) {
     var rippleds = this.getRippleds(nodes);
     var locations = {};
@@ -207,6 +207,7 @@ module.exports = {
     });
     return locations;
   },
+  */
 
   /*
   * @param {Object} raw crawl
