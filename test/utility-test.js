@@ -57,18 +57,6 @@ describe('Rawcrawl Util', function() {
       expect(obj).to.be.an('object');
     });
   });
-  describe('#getLocations()', function() {
-    it("Shouldn't throw an error when given valid crawl data", function() {
-      rc_util.getLocations(valid_crawl.data);
-    });
-    it("Should throw an error when given invalid crawl data", function() {
-      expect(function () { rc_util.getLocations(invalid_crawl.data);}).to.throw(Error);
-    });
-    it("Should return an object", function() {
-      var obj = rc_util.getLocations(valid_crawl.data);
-      expect(obj).to.be.an('object');
-    });
-  });
   describe('#getDegrees()', function() {
     it("Shouldn't throw an error when given valid crawl data", function() {
       rc_util.getDegrees(valid_crawl.data);
