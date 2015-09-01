@@ -19,10 +19,13 @@ module.exports = {
   */
   getRippleds: function(nodes) {
     var rippleds = {};
+    var maxUptimeByIpp = {};
+
     _.each(nodes, function(node) {
 
       // node properties
       var n_ipp = Object.keys(node)[0];
+      maxUptimeByIpp[n_ipp] = 0;
       var n_peers = node[n_ipp].overlay.active;
 
       _.each(n_peers, function(peer) {
@@ -42,9 +45,8 @@ module.exports = {
         } catch (error) {
           p_ipp = undefined;
         }
-
         var uptime = peer.uptime;
-
+        maxUptimeByIpp[n_ipp] = Math.max(maxUptimeByIpp[n_ipp], uptime);
         // Fill in rippled
         var rippled = rippleds[p_pk];
         if (rippled) {
@@ -60,8 +62,14 @@ module.exports = {
         } else {
           rippleds[p_pk] = {ipp: p_ipp, version: p_v, uptime: uptime};
         }
-
       });
+    });
+    // correcting uptime once rippleds and maxUptimeByIpp are ready
+    _.each(rippleds, function(r) {
+      var peerMaxUptime = r.ipp && maxUptimeByIpp[r.ipp];
+      if (!r.uptime || peerMaxUptime > r.uptime) {
+        r.uptime = peerMaxUptime;
+      }
     });
     return rippleds;
   },
