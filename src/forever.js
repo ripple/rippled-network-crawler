@@ -17,7 +17,6 @@ function callPrior(dbUrl, commander, lastCrawl) {
 
 module.exports = function(ipp, dbUrl, commander) {
   return new Promise(function(resolve, reject) {
-    commander.store = dbUrl;  // turning on -s dbUrl flag.
     src
     .enter(ipp, commander)
     .then(function(crawl) {

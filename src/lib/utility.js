@@ -3,8 +3,6 @@ var crawler = require('./crawler.js');
 var normalizeIpp = crawler.normalizeIpp;
 var normalizePubKey = crawler.normalizePubKey;
 var _ = require('lodash');
-var DB = require('./database');
-var modelsFactory = require('./models.js');
 var Promise = require('bluebird');
 
 var toNormPubKey = {};
@@ -309,26 +307,16 @@ module.exports = {
   * the row with that id (which contains a crawl)
   * Note: See readme for stucture of row in db
   */
-  getRowById: function(dbUrl, id, logsql) {
+  getRowById: function(dbUrl, key, logsql) {
+    var log = logsql ? console.log : false;
+    var hbaseHelper = require('./hbaseHelper').init(dbUrl);
     return new Promise(function(resolve, reject) {
-      if (id <= 0) {
-        return reject('Invalid id range');
-      }
-      var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
-
-      return modelsFactory(sql).then(function(model) {
-        return model.Crawl.findById(id).then(function(crawl) {
-          if (crawl) {
-            return resolve(crawl.dataValues);
-          } else {
-            return resolve();
-          }
-        }).catch(function(error) {
-          return reject(error);
-        });
+        hbaseHelper.getRows(key, key)
+        .then(function(rows) {
+          resolve(rows[0]);
+        })
+        .catch(reject);
       });
-    });
   },
 
   /*
@@ -340,25 +328,10 @@ module.exports = {
   * the an array of rows (which contains crawls)
   * Note: See readme for stucture of row in db
   */
-  getRowsByIds: function(dbUrl, startId, endId, logsql) {
-    return new Promise(function(resolve, reject) {
-      if (endId < startId || startId < 0 || endId < 0) {
-        return reject('Invalid id range');
-      }
-
-      var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
-
-      return modelsFactory(sql).then(function(model) {
-        return model.Crawl.findAll({
-          where: ["id >= ? and id <= ?", startId, endId]
-        }).then(function(crawls) {
-          return resolve(_.map(crawls, function(c){ return c.dataValues; }));
-        }).catch(function(error) {
-          return reject(error);
-        });
-      });
-    });
+  getRowsByIds: function(dbUrl, startKey, endKey, logsql) {
+    var log = logsql ? console.log : false;
+    var hbaseHelper = require('./hbaseHelper').init(dbUrl);
+    return hbaseHelper.getRows(startKey, endKey);
   },
 
   /*
@@ -369,25 +342,15 @@ module.exports = {
   * Note: See readme for stucture of row in db
   */
   getLatestRow: function(dbUrl, logsql) {
+    var log = logsql ? console.log : false;
+    var hbaseHelper = require('./hbaseHelper').init(dbUrl);
     return new Promise(function(resolve, reject) {
-      var log = logsql ? console.log : false;
-      var sql = DB.initSql(dbUrl, log);
-
-      return modelsFactory(sql).then(function(model) {
-        return model.Crawl.findOne({
-          order: [
-            ['id', 'DESC']
-          ]
-        }).then(function(crawl) {
-          if (crawl) {
-            return resolve(crawl.dataValues);
-          } else {
-            return resolve();
-          }
-        }).catch(function(error) {
-          return reject(error);
-        });
+        hbaseHelper.getRows('0', '9', 1, true)
+        .then(function(rows) {
+          resolve(rows[0]);
+        })
+        .catch(reject);
       });
-    });
   }
-};
+}
+
