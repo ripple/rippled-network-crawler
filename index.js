@@ -16,7 +16,7 @@ commander
           'Won\'t output crawl json')
   .option('-l, --logsql',
           'Log all sequelize queries and ddl')
-  .option('-m, --message <queueUrl>',
+  .option('-m, --message',
           'Send message for each crawl stored to db (needs -s) to sqs queue');
 
 commander
@@ -71,9 +71,22 @@ commander
   });
 
 commander
-  .command('forever <ipp> <dbUrl>')
+  .command('forever <ipp> [dbUrl]')
   .description('run crawl forever starting from ipp (-s flag will be turned on automatically)')
   .action(function(ipp, dbUrl) {
+    dbUrl = dbUrl || process.env.HBASE_URL;
+    if (!dbUrl) {
+      console.log('Error: either specify a dbUrl or set env variable HBASE_URL');
+      return;
+    }
+    if (commander.message) {
+      if (!process.env.SQS_URL) {
+        console.log('Error: SQS_URL env variable not provided');
+        return;
+      }
+      commander.message = process.env.SQS_URL;
+    }
+    commander.store = dbUrl;  // turning on -s dbUrl flag.
     src
     .forever(ipp, dbUrl, commander)
     .then(commander.quiet ? _.noop : console.log)

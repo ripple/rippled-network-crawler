@@ -1,25 +1,25 @@
 'use strict';
-var Sequelize = require('sequelize');
-var sql;
-var sqlInited;
-
+var HBase = require('./hbase-thrift');
+var hbaseInstances = {};
 module.exports = {
-  initSql: function(dbUrl, log) {
-    if (!sqlInited) {
-      sql = new Sequelize(dbUrl,
-      {
-        logging: log,
-        dialectOptions: {
-          ssl: true
-        },
-        pool: {
-          maxConnections: 10,
-          minConnections: 0,
-          maxIdleTime: 10000
-        }
+  /**
+   * returns hbase client.
+   * if the same database url is given multiple time the
+   * same client will be returned always
+   * @param  {string} dbUrl is in host:port format
+   * @return {Obj}    the Hbase client
+   */
+  initHbase: function(dbUrl) {
+    if (!hbaseInstances[dbUrl]) {
+      hbaseInstances[dbUrl] = new HBase({
+        logLevel: 1,
+        servers: [{
+            host: dbUrl.split(':')[0],
+            port: dbUrl.split(':')[1]
+          }
+        ]
       });
-      sqlInited = true;
     }
-    return sql;
+    return hbaseInstances[dbUrl];
   }
 };

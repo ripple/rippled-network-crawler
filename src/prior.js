@@ -1,7 +1,5 @@
 'use strict';
-var DB = require('./lib/database');
 var rc_util = require('./lib/utility.js');
-var modelsFactory = require('./lib/models.js');
 var selective = require('./program').selective;
 var Promise = require('bluebird');
 
