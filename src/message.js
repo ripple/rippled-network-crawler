@@ -3,7 +3,7 @@ var moment = require('moment');
 AWS.config.region = 'us-west-2';
 var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 var Promise = require('bluebird');
-var hbaseUtils = require('./lib/hbaseHelper').utils;
+var hbaseUtils = require('crawler-hbase').utils;
 
 module.exports = function(key, queueUrl) {
   return new Promise(function(resolve, reject) {

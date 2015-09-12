@@ -23,7 +23,9 @@ function getAvgOut(degrees) {
 module.exports = function(dbUrl, id, commander) {
   return new Promise(function(resolve, reject) {
     id = parseInt(id, 10);
-    rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+    var hbaseHelper = require('crawler-hbase').init(dbUrl);
+    hbaseHelper.getRowByKey(id)
+    .then(function(row) {
       var body = JSON.parse(row.data);
       var results = {entry: row.entry_ipp,
                      general: {},

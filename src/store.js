@@ -1,10 +1,10 @@
 'use strict';
 var Promise = require('bluebird');
 var moment = require('moment');
-var hbaseUtils = require('./lib/hbaseHelper').utils;
+var hbaseUtils = require('crawler-hbase').utils;
 
 function saveDB(crawlJson, dbUrl) {
-  var hbaseHelper = require('./lib/hbaseHelper').init(dbUrl);
+  var hbaseHelper = require('crawler-hbase').init(dbUrl);
   return hbaseHelper.storeCrawl(crawlJson);
 }
 

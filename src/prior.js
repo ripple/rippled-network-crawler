@@ -17,7 +17,8 @@ module.exports = function(dbUrl, commander, lastCrawl) {
     if (lastCrawl) {
       useLatestCrawl(lastCrawl);
     } else {
-      rc_util.getLatestRow(dbUrl, commander.logsql)
+      var hbaseHelper = require('crawler-hbase').init(dbUrl);
+      hbaseHelper.getLatestRow()
       .then(function(row) {
         useLatestCrawl(JSON.parse(row.data));
       })

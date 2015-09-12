@@ -38,7 +38,9 @@ function graphify(crawl) {
 
 module.exports = function(dbUrl, id, commander) {
   return new Promise(function(resolve, reject) {
-    rc_util.getRowById(dbUrl, id, commander.logsql).then(function(row) {
+    var hbaseHelper = require('crawler-hbase').init(dbUrl);
+    hbaseHelper.getRowByKey(id)
+    .then(function(row) {
       var graph = graphify(JSON.parse(row.data));
       if (commander.readable) {
         console.log(JSON.stringify(graph, null, 4));
