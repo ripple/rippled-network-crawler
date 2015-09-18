@@ -14,7 +14,7 @@
     "chai": "^3.0.0",
     "check-types": "^3.3.0",
     "commander": "^2.8.1",
-    "hbase": "^0.2.1",
+    "crawler-hbase": "latest",
     "lodash": "^3.7.0",
     "mocha": "^2.2.5",
     "moment": "2.10.3",
@@ -22,9 +22,7 @@
     "pg": "^4.4.0",
     "pg-hstore": "^2.3.2",
     "request": "^2.55.0",
-    "ripple-lib": "^0.12.3",
-    "thrift": "^0.9.2",
-    "winston": "^1.0.1"
+    "ripple-lib": "^0.12.3"
   },
   "bin": {
     "rippled-network-crawler": "./index.js"

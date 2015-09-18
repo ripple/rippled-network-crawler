@@ -2,6 +2,7 @@
 var assert = require('chai').assert;
 var expect = require('chai').expect;
 var rc_util = require('../src/lib/utility.js');
+var HbaseClient = require('crawler-hbase').Client;
 
 var invalid_crawl = require('./data/invalid_crawl.json');
 var valid_crawl = require('./data/valid_crawl.json');
@@ -107,15 +108,17 @@ describe.skip('Database Util', function() {
       });
     });
   });
-  describe('#getLatestRow()', function() {
+  describe('#getLatestRawCrawl()', function() {
     it("Shouldn't throw an error when given valid database", function() {
       var logsql = false;
-      rc_util.getLatestRow(db_url, logsql);
+      var hbaseClient = new HbaseClient(db_url);
+      hbaseClient.getLatestRawCrawl();
     });
     it("Should return an object with expected properties", function(done) {
       this.timeout(10000);
       var logsql = false;
-      rc_util.getLatestRow(db_url, logsql)
+      var hbaseClient = new HbaseClient(db_url);
+      hbaseClient.getLatestRawCrawl()
       .then(function(row) {
         if (row) {
           expect(row).to.have.property('rowkey');

@@ -2,6 +2,7 @@
 var rc_util = require('./lib/utility.js');
 var selective = require('./program').selective;
 var Promise = require('bluebird');
+var HbaseClient = require('crawler-hbase').Client;
 
 module.exports = function(dbUrl, commander, lastCrawl) {
   return new Promise(function(resolve, reject) {
@@ -17,7 +18,8 @@ module.exports = function(dbUrl, commander, lastCrawl) {
     if (lastCrawl) {
       useLatestCrawl(lastCrawl);
     } else {
-      rc_util.getLatestRow(dbUrl, commander.logsql)
+      var hbaseClient = new HbaseClient(dbUrl);
+      hbaseClient.getLatestRawCrawl()
       .then(function(row) {
         useLatestCrawl(JSON.parse(row.data));
       })
