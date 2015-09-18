@@ -2,10 +2,11 @@
 var Promise = require('bluebird');
 var moment = require('moment');
 var hbaseUtils = require('crawler-hbase').utils;
+var HbaseClient = require('crawler-hbase').Client;
 
 function saveDB(crawlJson, dbUrl) {
-  var hbaseHelper = require('crawler-hbase').init(dbUrl);
-  return hbaseHelper.storeCrawl(crawlJson);
+  var hbaseClient = new HbaseClient(dbUrl);
+  return hbaseClient.storeRawCrawl(crawlJson);
 }
 
 module.exports = function(crawl, dbUrl, logsql) {

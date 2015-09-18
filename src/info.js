@@ -2,6 +2,7 @@
 var rc_util = require('./lib/utility.js');
 var _ = require('lodash');
 var Promise = require('bluebird');
+var HbaseClient = require('crawler-hbase').Client;
 
 function getAvgIn(degrees) {
   var sum = 0;
@@ -23,8 +24,8 @@ function getAvgOut(degrees) {
 module.exports = function(dbUrl, id, commander) {
   return new Promise(function(resolve, reject) {
     id = parseInt(id, 10);
-    var hbaseHelper = require('crawler-hbase').init(dbUrl);
-    hbaseHelper.getRowByKey(id)
+    var hbaseClient = new HbaseClient(dbUrl);
+    hbaseClient.getRawCrawlByKey(id)
     .then(function(row) {
       var body = JSON.parse(row.data);
       var results = {entry: row.entry_ipp,

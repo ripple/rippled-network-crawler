@@ -2,6 +2,7 @@
 var rc_util = require('./lib/utility.js');
 var _ = require('lodash');
 var Promise = require('bluebird');
+var HbaseClient = require('crawler-hbase').Client;
 
 /*
 * Returns metrics of raw crawl
@@ -38,8 +39,8 @@ function graphify(crawl) {
 
 module.exports = function(dbUrl, id, commander) {
   return new Promise(function(resolve, reject) {
-    var hbaseHelper = require('crawler-hbase').init(dbUrl);
-    hbaseHelper.getRowByKey(id)
+    var hbaseClient = new HbaseClient(dbUrl);
+    hbaseClient.getRawCrawlByKey(id)
     .then(function(row) {
       var graph = graphify(JSON.parse(row.data));
       if (commander.readable) {
