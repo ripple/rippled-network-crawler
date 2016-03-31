@@ -193,6 +193,12 @@ Crawler.prototype.crawl = function(ipp, hops) {
 
     self.dequeue(ipp);
 
+    if (!error && !body.overlay) {
+      error = {
+        message: 'empty overlay'
+      }
+    }
+
     if (error) {
       // save error
       var err = {};

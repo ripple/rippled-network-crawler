@@ -272,22 +272,24 @@ module.exports = {
 
       // node properties
       var n_ipp = Object.keys(node)[0];
-      var n_peers = node[n_ipp].overlay.active;
+      if (node[n_ipp].overlay) {
+        var n_peers = node[n_ipp].overlay.active;
 
-      ipps[n_ipp] = 1;
+        ipps[n_ipp] = 1;
 
-      _.each(n_peers, function(peer) {
+        _.each(n_peers, function(peer) {
 
-        // peer properties
-        var p_ipp;
-        try {
-          p_ipp = normalizeIpp(peer.ip, peer.port);
-          ipps[p_ipp] = 1;
-        } catch (error) {
-          p_ipp = undefined;
-        }
+          // peer properties
+          var p_ipp;
+          try {
+            p_ipp = normalizeIpp(peer.ip, peer.port);
+            ipps[p_ipp] = 1;
+          } catch (error) {
+            p_ipp = undefined;
+          }
 
-      });
+        });
+      }
     });
 
     var out = [];
