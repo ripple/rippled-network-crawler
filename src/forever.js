@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 function callPrior(dbUrl, commander, lastCrawl) {
   src
   .prior(dbUrl, commander, lastCrawl)
+  .delay(20 * 1000)
   .then(function(crawl) {
     process.nextTick(function() {
       callPrior(dbUrl, commander, crawl.data);
