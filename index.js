@@ -17,7 +17,9 @@ commander
   .option('-l, --logsql',
           'Log all sequelize queries and ddl')
   .option('-m, --message',
-          'Send message for each crawl stored to db (needs -s) to sqs queue');
+          'Send message for each crawl stored to db (needs -s) to sqs queue')
+  .option('-d, --delay <delay>',
+          'delay between crawls with forever mode, in seconds', parseInt);
 
 commander
   .command('enter <ipp>')
