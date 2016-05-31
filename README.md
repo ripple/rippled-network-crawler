@@ -44,6 +44,7 @@ $ rippled-network-crawler --help
     -q, --quiet               Won't output crawl json
     -l, --logsql              Log all sequelize queries and ddl
     -m, --message <queueUrl>  Send message for each crawl stored to db (needs -s) to sqs queue
+    -d, --delay <delay>       Delay between crawls with forever mode, in seconds
 ```
 
 ## Output structure
