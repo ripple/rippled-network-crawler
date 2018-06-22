@@ -1,46 +1,29 @@
 {
   "name": "rippled-network-crawler",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "description": "command line interface to crawl a rippled network",
   "license": "ISC",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/"
   },
-  "author": "Souren Papazian",
+  "author": "Matthew Fettig",
   "dependencies": {
-    "aws-sdk": "^2.1.45",
-    "bluebird": "^2.9.27",
-    "chai": "^3.0.0",
-    "check-types": "^3.3.0",
-    "commander": "^2.8.1",
-    "crawler-hbase": "latest",
-    "lodash": "^3.7.0",
-    "mocha": "^2.2.5",
-    "moment": "2.10.3",
-    "nconf": "^0.7.1",
-    "pg": "^4.4.0",
-    "pg-hstore": "^2.3.2",
-    "request": "^2.55.0",
-    "ripple-lib": "^0.12.3"
-  },
-  "bin": {
-    "rippled-network-crawler": "./index.js"
+    "axios": "^0.18.0",
+    "mocha": "^5.2.0",
+    "moment": "^2.22.2",
+    "nconf": "^0.10.0",
+    "ripple-address-codec": "^2.0.1"
   },
   "directories": {
     "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SourenP/rippled-network-crawler.git"
+    "url": "git+https://github.com/ripple/rippled-network-crawler.git"
   },
-  "keywords": [
-    "ripple",
-    "crawler",
-    "rippled"
-  ],
   "bugs": {
-    "url": "https://github.com/SourenP/rippled-network-crawler/issues"
+    "url": "https://github.com/ripple/rippled-network-crawler/issues"
   },
-  "homepage": "https://github.com/SourenP/rippled-network-crawler#readme"
+  "homepage": "https://github.com/ripple/rippled-network-crawler#readme"
 }
