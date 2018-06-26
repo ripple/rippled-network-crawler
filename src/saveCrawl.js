@@ -12,11 +12,23 @@ const getInverseTimestamp = date => (timeInfinity - Number(moment.utc(date).form
 
 module.exports = data => {
   log.info(`total connections: ${data.connections.length}`);
-  return hbase.putRow({
+  const tasks = [];
+
+  tasks.push(hbase.putRow({
     table: 'network_crawls',
     rowkey: getInverseTimestamp(data.start),
     columns: data
-  })
+  }))
+
+  data.nodes.forEach(d => {
+    hbase.putRow({
+      table: 'node_state',
+      rowkey: d.pubkey_node,
+      columns: d
+    })
+  });
+
+  return Promise.all(tasks)
   .then(() => {
     log.info('network crawl saved');
   });
