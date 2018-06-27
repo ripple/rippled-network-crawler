@@ -19,6 +19,7 @@ const recursiveCrawl = () => {
   })
   .catch(error => {
     log.error(error);
+    log.info('failed to record crawl');
     setTimeout(recursiveCrawl, TIMEOUT);
   });
 }

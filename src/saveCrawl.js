@@ -21,11 +21,11 @@ module.exports = data => {
   }))
 
   data.nodes.forEach(d => {
-    hbase.putRow({
+    tasks.push(hbase.putRow({
       table: 'node_state',
       rowkey: d.pubkey_node,
       columns: d
-    })
+    }))
   });
 
   return Promise.all(tasks)

@@ -15,7 +15,7 @@
     "moment": "^2.22.2",
     "nconf": "^0.10.0",
     "ripple-address-codec": "^2.0.1",
-    "ripple-hbase-client": "^0.1.12-thrift"
+    "ripple-hbase-client": "^0.1.13-thrift"
   },
   "directories": {
     "test": "test"
