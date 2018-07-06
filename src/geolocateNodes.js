@@ -6,11 +6,11 @@ const log = require('./logger');
 
 const getNodes = () => {
   return hbase.getScan({
-    table: 'node_state',
-    startRow: ' ',
-    stopRow: '~~'
+    table: 'network_crawls',
+    columns: ['d:nodes'],
+    limit: 1
   })
-  .then(resp => resp.rows.map(d => d.columns))
+  .then(resp => resp.rows.length ? JSON.parse(resp.rows[0].columns.nodes) : []);
 }
 
 const updateFromMaxmind = node => {
