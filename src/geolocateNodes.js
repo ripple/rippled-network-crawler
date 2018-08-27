@@ -106,13 +106,12 @@ const updateGeolocation = node => {
 };
 
 
-module.exports = (all = false) => {
+module.exports = () => {
   log.info('starting geolocation...'.yellow);
   return getNodes()
   .then(nodes => {
     const list = nodes
       .filter(n => (/\./).test(n.host))
-      .filter(n => all || n.location_source === undefined)
 
     log.info('found', list.length.toString().underline,
             'nodes with IP');

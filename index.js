@@ -7,8 +7,8 @@ const TIMEOUT = 120 * 1000;
 const INTERVAL = 60 * 60 * 1000;
 const INTERVAL2 = INTERVAL * 24 * 7;
 
-const geolocate = (all) => {
-  geolocateNodes(all).catch(log.error);
+const geolocate = () => {
+  geolocateNodes().catch(log.error);
 }
 
 const recursiveCrawl = () => {
