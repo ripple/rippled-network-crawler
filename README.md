@@ -1,58 +1,56 @@
-# Rippled Network Crawler
+# XRPL Network Crawler
 
-This crawls the ripple network,
-via making requests to the /crawl endpoint of each peer it can connect to,
-starting from an entry point. Some peers may know, and publish (perhaps errantly
-.. ), the ip associated with a peer, while others don't. We merge the points of
-view of each peer, collecting a dict of data, keyed by ip address.
+The network crawler looks for all nodes on the XRPL network.  The crawler starts with a single rippled IP address, and queries its `/crawl` endpoint to get other peers connected to it.  All of these nodes are added to the list, and any that also have an IP listed via the endpoint is then queried to find more nodes.  The process is repeated until no new nodes with IP addresses are found.  The interval between network crawls is 2 minutes.  The full results of each crawl are added to the `prod_network_crawls` table, and the data for each node found is used to update the `prod_node_state` table.
 
-This maps out the connections between all rippled servers (not necessarily UNLS)
-who (for the most part) don't even participate in Consensus or at least don't
-have any say in influencing the outcome of a transaction on mainnet.
+#### Geolocation
 
+Nodes from the latest crawl with IP addresses are geolocated every 6 hours.  This data is saved into the `prod_node_state` table.  All the column family `f` values come from the geolocation service.
 
-### crawl
+#### Setup
 
-|   Column          |           Type            |
-|-------------------|---------------------------|
-| start             | timestamp UTC             |
-| end_at            | timestamp UTC             |
-| nodes             | topology nodes found      |
-| connections       | connections between nodes |
-| nodes_count       | # of nodes                |
-| connections_count | # of connections          |
-
-### Example output
-
-```json
-{
-  "nodes": [
-    {
-      "host": "169.44.60.105",
-      "in": 49,
-      "out": 29,
-      "pubkey_node": "n9LKATbwprxwHPuQpJC2oJjkKZXHPaCjHUskDSBgvDTrTWQLnMwr",
-      "hostid": "BRAG",
-      "server_state": "full",
-      "ledgers": "32570-39565885",
-      "latency": 1,
-      "load_factor": 1,
-      "peers": 78,
-      "quorum": 12,
-      "version": "1.0.1",
-      "uptime": 582223,
-      "done": true
-    }
-  ],
-  "connections": [
-    "n9LKATbwprxw>n9KcmEKTW3gg",
-    "n9LKATbwprxw>n9MGChK9EgiC",
-    "n9LKATbwprxw>n9LMyDmtyYEA",
-    "n9LKATbwprxw>n9MHTnqzvyRn"
-  ],
-  "nodes_count": 22,
-  "connections_count": 345,
-  "end": "2018-06-22 16:00:27.575Z",
-  "start": "2018-06-22 16:00:13.413Z"
-}
+clone the repo, create a config.json file with the hbase connection details and entry IP, then:
 ```
+$ npm install
+$ node index
+
+```
+
+#### HBase Tables
+
+* **prod_network_crawls**
+  * rowkey: inverse timestamp
+  * columns:
+    * d:nodes_count
+    * d:connections_count
+    * d:nodes
+    * d:connections
+    * d:start
+    * d:end
+
+* **prod_node_state**
+  * rowkey: node_pubkey
+  * columns:
+    * d:pubkey_node
+    * d:version
+    * d:quorum
+    * d:host
+    * d:port
+    * d:peers
+    * d:out
+    * d:in
+    * d:load_factor
+    * d:server_state
+    * d:uptime
+    * d:hostid
+    * d:latency
+    * d:ledgers
+    * f:location_source
+    * f:isp
+    * f:long
+    * f:lat
+    * f:country_code
+    * f:country
+    * f:timezoneee
+    * f:region
+    * f:region_code
+    * f:postal_code

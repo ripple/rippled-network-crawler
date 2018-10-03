@@ -9,7 +9,6 @@ const timeInfinity = 99999999999999;
 
 const getInverseTimestamp = date => (timeInfinity - Number(moment.utc(date).format(formatKey))).toString();
 
-
 module.exports = data => {
   log.info(`total connections: ${data.connections.length}`);
   const tasks = [];
@@ -24,7 +23,7 @@ module.exports = data => {
     tasks.push(hbase.putRow({
       table: 'node_state',
       rowkey: d.pubkey_node,
-      columns: d
+      columns: Object.assign({}, d, { last_updated: moment.utc().format() })
     }))
   });
 
