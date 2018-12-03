@@ -52,9 +52,7 @@ const queryNode = (pubkey, nodes) => {
     return Promise.resolve(); // nothing to query
   }
 
-  const getInfo = nodes[pubkey].time
-  ? Promise.resolve()
-  : getNodeInfo(host)
+  const getInfo = getNodeInfo(host)
     .then(info => {
       if (info.pubkey_node && info.pubkey_node !== pubkey) {
         log.info('key mismatch:', info.pubkey_node, pubkey);
