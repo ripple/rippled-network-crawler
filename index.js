@@ -1,10 +1,11 @@
+require('colors');
 const crawlNodes = require('./src/crawlNodes');
 const geolocateNodes = require('./src/geolocateNodes');
 const save = require('./src/saveCrawl');
 const config = require('./src/config');
 const log = require('./src/logger');
 const TIMEOUT = 120 * 1000;
-const INTERVAL = 6 * 60 * 60 * 1000;
+const INTERVAL = 24 * 60 * 60 * 1000;
 
 const geolocate = () => {
   geolocateNodes().catch(log.error);
@@ -23,7 +24,7 @@ const recursiveCrawl = () => {
   });
 }
 
-recursiveCrawl();
-geolocate();
+recursiveCrawl()
+//geolocate();
 setInterval(geolocate, INTERVAL);
 
