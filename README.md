@@ -1,56 +1,47 @@
 # XRPL Network Crawler
 
-The network crawler looks for all nodes on the XRPL network.  The crawler starts with a single rippled IP address, and queries its `/crawl` endpoint to get other peers connected to it.  All of these nodes are added to the list, and any that also have an IP listed via the endpoint is then queried to find more nodes.  The process is repeated until no new nodes with IP addresses are found.  The interval between network crawls is 2 minutes.  The full results of each crawl are added to the `prod_network_crawls` table, and the data for each node found is used to update the `prod_node_state` table.
+The network crawler looks for all nodes on the XRPL network.  The crawler starts with a single rippled IP address, and queries its `/crawl` endpoint to get other peers connected to it.  All of these nodes are added to the list, and any that also have an IP listed via the endpoint is then queried to find more nodes.  The process is repeated until no new nodes with IP addresses are found.  The interval between network crawls is 2 minutes.  The full results of each crawl are added to the `crawls` table.
 
 #### Geolocation
 
-Nodes from the latest crawl with IP addresses are geolocated every 6 hours.  This data is saved into the `prod_node_state` table.  All the column family `f` values come from the geolocation service.
+Nodes from the latest crawl with IP addresses are geolocated every 24 hours.  This data is saved into the `location` table.
 
 #### Setup
 
-clone the repo, create a config.json file with the hbase connection details and entry IP, then:
+Clone the repo, create a config.json file with the data connection details and entry IP, then:
 ```
 $ npm install
-$ node index
-
+$ node setup <--- db initialization
 ```
 
-#### HBase Tables
+Then run the service with `$ node index`
 
-* **prod_network_crawls**
-  * rowkey: inverse timestamp
-  * columns:
-    * d:nodes_count
-    * d:connections_count
-    * d:nodes
-    * d:connections
-    * d:start
-    * d:end
+#### DB Tables
 
-* **prod_node_state**
-  * rowkey: node_pubkey
-  * columns:
-    * d:pubkey_node
-    * d:version
-    * d:quorum
-    * d:host
-    * d:port
-    * d:peers
-    * d:out
-    * d:in
-    * d:load_factor
-    * d:server_state
-    * d:uptime
-    * d:hostid
-    * d:latency
-    * d:ledgers
-    * f:location_source
-    * f:isp
-    * f:long
-    * f:lat
-    * f:country_code
-    * f:country
-    * f:timezoneee
-    * f:region
-    * f:region_code
-    * f:postal_code
+* **crawls**
+  * start
+  * end
+  * nodes_count
+  * connections_count
+  * nodes
+  * connections
+
+* **location**
+  * pubkey
+  * ip
+  * updated
+  * location_source
+  * long
+  * lat
+  * continent
+  * country_code
+  * country
+  * region
+  * city
+  * postal_code
+  * region_code
+  * country_code
+  * timezone
+  * org
+  * domain
+  * isp
