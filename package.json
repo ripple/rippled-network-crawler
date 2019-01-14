@@ -16,7 +16,8 @@
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
     "nconf": "^0.10.0",
-    "ripple-address-codec": "^2.0.1",
+    "pg": "^7.7.1",
+    "ripple-address-codec": "^2.0.1"
   },
   "directories": {
     "test": "test"
