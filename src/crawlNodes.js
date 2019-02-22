@@ -41,10 +41,13 @@ const handlePeers = (pubkey, peers, nodes) => {
       log.info('unknown direction:', d);
     }
 
-    nodes[peer].uptime = d.uptime;
-    if (d.complete_ledgers) {
+    if (d.complete_ledgers && !nodes[peer].ledgers) {
       nodes[peer].ledgers = d.complete_ledgers;
     }
+
+    nodes[peer].uptime = d.uptime;
+    nodes[peer].host = d.ip || nodes[peer].host;
+    nodes[peer].port = d.port || nodes[peer].port;
   });
 }
 
@@ -132,13 +135,12 @@ module.exports = async (host, port) => {
   }
 
   nodes[server.pubkey_node] = Object.assign({
-    pubkey_node: server.pubkey_node,
     host,
     port,
     in: {},
     out: {},
     done: true
-  }, data.server);
+  }, server);
 
   handlePeers(server.pubkey_node, data.peers, nodes);
   await queryNewNodes(nodes);
