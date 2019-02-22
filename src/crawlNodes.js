@@ -26,7 +26,6 @@ const handlePeers = (pubkey, peers, nodes) => {
         port: d.port,
         pubkey_node: peer,
         version: d.version.replace('rippled-', ''),
-        uptime: d.uptime,
         in: {},
         out: {}
       };
@@ -40,6 +39,11 @@ const handlePeers = (pubkey, peers, nodes) => {
       nodes[pubkey].out[peer] = true;
     } else {
       log.info('unknown direction:', d);
+    }
+
+    nodes[peer].uptime = d.uptime;
+    if (d.complete_ledgers) {
+      nodes[peer].ledgers = d.complete_ledgers;
     }
   });
 }
