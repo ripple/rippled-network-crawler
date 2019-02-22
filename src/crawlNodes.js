@@ -1,7 +1,7 @@
 const moment = require('moment');
 const ripple = require('ripple-address-codec');
-const getNodeInfo = require('./getNodeInfo');
-const getNodeConnections = require('./getNodeConnections');
+const queryCrawl = require('./queryCrawl');
+const queryServerInfo = require('./queryServerInfo');
 const log = require('./logger');
 
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss[Z]';
@@ -44,7 +44,7 @@ const handlePeers = (pubkey, peers, nodes) => {
   });
 }
 
-const queryNode = (pubkey, nodes) => {
+const queryNode = async (pubkey, nodes) => {
   const { host, port } = nodes[pubkey];
   nodes[pubkey].done = true;
 
@@ -52,25 +52,15 @@ const queryNode = (pubkey, nodes) => {
     return Promise.resolve(); // nothing to query
   }
 
-  const getInfo = getNodeInfo(host)
-    .then(info => {
-      if (info.pubkey_node && info.pubkey_node !== pubkey) {
-        log.info('key mismatch:', info.pubkey_node, pubkey);
-      } else {
-        Object.assign(nodes[pubkey], info);
-      }
-    });
+  try {
+    const data = await queryCrawl(host, port);
+    const server = data.server || await queryServerInfo(host);
+    Object.assign(nodes[server.pubkey_node], server);
+    handlePeers(pubkey, data.peers, nodes);
 
-  return getInfo
-  .then(() => {
-    return getNodeConnections(host, port)
-    .then(peers => {
-      handlePeers(pubkey, peers, nodes)
-    })
-  })
-  .catch(error => {
-    log.debug(error.toString())
-  });
+  } catch(e) {
+    log.debug(e.toString());
+  }
 };
 
 const queryNewNodes = nodes => {
@@ -125,31 +115,33 @@ const formatData = (data) => {
   }
 }
 
-module.exports = (host, port) => {
+module.exports = async (host, port) => {
   const start = moment.utc().format(TIME_FORMAT);
   log.info(`starting topology crawl at ${start}`)
-  return getNodeInfo(host)
-  .then(info => {
 
-    if (!info.pubkey_node) {
-      throw new Error('unable to query entry host info');
-    }
+  const nodes = {};
+  const data = await queryCrawl(host, port);
+  const server = data.server || await queryServerInfo(host);
 
-    const nodes = {};
-    nodes[info.pubkey_node] = Object.assign({
-      host,
-      port,
-      in: {},
-      out: {}
-    }, info);
+  if (!server || !server.pubkey_node) {
+    throw new Error('unable to query entry host info');
+  }
 
-    return queryNewNodes(nodes)
-  })
-  .then(formatData)
-  .then(data => {
-    data.start = start;
-    data.nodes_count = data.nodes.length;
-    data.connections_count = data.connections.length;
-    return data;
-  })
+  nodes[server.pubkey_node] = Object.assign({
+    pubkey_node: server.pubkey_node,
+    host,
+    port,
+    in: {},
+    out: {},
+    done: true
+  }, data.server);
+
+  handlePeers(server.pubkey_node, data.peers, nodes);
+  await queryNewNodes(nodes);
+
+  const formatted = formatData(nodes);
+  formatted.start = start;
+  formatted.nodes_count = formatted.nodes.length;
+  formatted.connections_count = formatted.connections.length;
+  return formatted;
 };

@@ -48,7 +48,6 @@ module.exports = host => {
     validated_ledger: info.validated_ledger ? {
       ledger_index: info.validated_ledger.seq,
       ledger_hash: info.validated_ledger.hash,
-      age: info.validated_ledger.age
     } : undefined,
     amendment_blocked: info.amendment_blocked,
     quorum: info.validation_quorum,
@@ -57,6 +56,6 @@ module.exports = host => {
   }))
   .catch(e => {
     log.debug(e.toString());
-    return {}
+    return undefined;
   })
 };
