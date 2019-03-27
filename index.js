@@ -24,7 +24,6 @@ const recursiveCrawl = () => {
   });
 }
 
-recursiveCrawl()
-//geolocate();
+recursiveCrawl();
 setInterval(geolocate, INTERVAL);
 

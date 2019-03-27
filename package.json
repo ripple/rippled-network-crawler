@@ -5,7 +5,8 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/"
+    "test": "mocha test/",
+    "start": "nodemon index"
   },
   "author": "Matthew Fettig",
   "dependencies": {
@@ -16,6 +17,7 @@
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
     "nconf": "^0.10.0",
+    "nodemon": "^1.18.10",
     "pg": "^7.7.1",
     "ripple-address-codec": "^2.0.1"
   },
