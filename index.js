@@ -4,26 +4,24 @@ const geolocateNodes = require('./src/geolocateNodes');
 const save = require('./src/saveCrawl');
 const config = require('./src/config');
 const log = require('./src/logger');
-const TIMEOUT = 120 * 1000;
+
+const CRAWL_INTERVAL = 120 * 1000;
 const INTERVAL = 24 * 60 * 60 * 1000;
 
 const geolocate = () => {
   geolocateNodes().catch(log.error);
 }
 
-const recursiveCrawl = () => {
+const doCrawl = () => {
   crawlNodes(config.get('entry'))
   .then(save)
-  .then(() => {
-    setTimeout(recursiveCrawl, TIMEOUT);
-  })
   .catch(error => {
     log.error(error);
     log.info('failed to record crawl');
-    setTimeout(recursiveCrawl, TIMEOUT);
   });
 }
 
-recursiveCrawl();
+doCrawl();
 setInterval(geolocate, INTERVAL);
+setInterval(doCrawl, CRAWL_INTERVAL);
 

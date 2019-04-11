@@ -17,7 +17,7 @@ const normalizePubKey = pubKeyStr => {
 }
 
 const handlePeers = (pubkey, peers, nodes) => {
-    peers.forEach(d => {
+  peers.forEach(d => {
     const peer = normalizePubKey(d.public_key);
 
     if (!nodes[peer]) {
@@ -83,12 +83,9 @@ const queryNewNodes = nodes => {
   log.info(`# nodes found: ${keys.length}`);
   log.info(`# nodes to query: ${tasks.length}`);
 
-  if (!tasks.length) {
-    return nodes;
-  }
-
-  return Promise.all(tasks)
-  .then(queryNewNodes.bind(this, nodes));
+  return tasks.length
+    ? Promise.all(tasks).then(queryNewNodes.bind(this, nodes))
+    : Promise.resolve(nodes);
 }
 
 const formatData = (data) => {
