@@ -14,7 +14,6 @@ const setup = () => {
   .createTable('location', t => {
     t.string('pubkey').primary();
     t.string('ip');
-    t.dateTime('updated');
     t.decimal('lat');
     t.decimal('long');
     t.string('continent');
@@ -29,6 +28,7 @@ const setup = () => {
     t.string('org');
     t.string('domain');
     t.string('location_source');
+    t.dateTime('updated');
   });
 }
 
