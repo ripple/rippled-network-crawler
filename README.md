@@ -8,7 +8,7 @@ Nodes from the latest crawl with IP addresses are geolocated every 24 hours.  Th
 
 #### Setup
 
-Clone the repo, create a config.json file with the data connection details and entry IP, then:
+Clone the repo, create a `config.json` file (refer to `example-config.json`). Enter your PostgreSQL connection details and entry IP, then:
 ```
 $ npm install
 $ node setup <--- db initialization
