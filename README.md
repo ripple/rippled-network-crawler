@@ -1,4 +1,4 @@
-# [Moved to xpring-eng](https://github.com/xpring-eng/validations-etl)
+# [Moved to xpring-eng](https://github.com/xpring-eng/rippled-network-crawler)
 
 If you are developing the instance of this project that is used with the [XRP Ledger Explorer](https://livenet.xrpl.org/), please use https://github.com/xpring-eng/rippled-network-crawler
 
