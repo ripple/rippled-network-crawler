@@ -1,0 +1,10 @@
+{
+  "db": {
+    "client": "pg",
+    "connection": {
+      "username": "",
+      "database": ""
+    }
+  },
+  "entry": "s2.ripple.com"
+}
