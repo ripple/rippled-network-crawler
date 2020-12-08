@@ -6,5 +6,6 @@
       "database": ""
     }
   },
-  "entry": "s2.ripple.com"
+  "entry": "s2.ripple.com",
+  "reset_db": false
 }

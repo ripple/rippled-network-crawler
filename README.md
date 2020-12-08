@@ -13,6 +13,7 @@ Clone the repo, create a `config.json` file (refer to `example-config.json`). En
 $ npm install
 $ node setup <--- db initialization
 ```
+Setting `reset_db` to true will teardown all the existing dbs when doing `node setup`
 
 Then run the service with `$ node index`
 
