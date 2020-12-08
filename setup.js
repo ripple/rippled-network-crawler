@@ -1,7 +1,7 @@
 const config = require('./src/config');
 const knex = require('knex')(config.get('db'));
 
-const setup = () => {
+const setup = async() => {
   let tablesToCreate = [];
   const hasCrawls = await knex.schema.hasTable('crawls');
   const hasLocation = await knex.schema.hasTable('location');
