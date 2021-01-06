@@ -1,3 +1,7 @@
+# [Moved to xpring-eng](https://github.com/xpring-eng/rippled-network-crawler)
+
+If you are developing the instance of this project that is used with the [XRP Ledger Explorer](https://livenet.xrpl.org/), please use https://github.com/xpring-eng/rippled-network-crawler
+
 # XRPL Network Crawler
 
 The network crawler looks for all nodes on the XRPL network.  The crawler starts with a single rippled IP address, and queries its `/crawl` endpoint to get other peers connected to it.  All of these nodes are added to the list, and any that also have an IP listed via the endpoint is then queried to find more nodes.  The process is repeated until no new nodes with IP addresses are found.  The interval between network crawls is 2 minutes.  The full results of each crawl are added to the `crawls` table.
