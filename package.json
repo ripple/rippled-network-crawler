@@ -16,7 +16,7 @@
     "knex": "^0.21.5",
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
-    "nconf": "^0.10.0",
+    "nconf": "^0.11.4",
     "nodemon": "^1.18.10",
     "pg": "^8.3.3",
     "ripple-address-codec": "^2.0.1"
